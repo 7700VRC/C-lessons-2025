@@ -18,6 +18,45 @@ competition Competition;
 controller  Controller1;
 brain Brain;
 
+/// MOTORS and Devices Info for 7899C Robot
+//Scoring/Intake Motors
+motor Intake = motor(PORT11, ratio6_1, false);
+motor WallStake = motor(PORT12, ratio18_1, false);
+//Drive Motors
+motor RightTop = motor(PORT7, ratio6_1, false);
+motor RightMiddle = motor(PORT5, ratio6_1, true);
+motor RightBack = motor(PORT6, ratio6_1, true);
+motor LeftTop = motor(PORT10, ratio6_1, true);
+motor LeftMiddle = motor(PORT9, ratio6_1, false);
+motor LeftBack = motor(PORT8, ratio6_1, false);
+//Pneumatics
+pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
+pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
+//Gyro
+inertial Gyro = inertial(PORT20);
+//Potentiometer
+analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
+
+//END-- MOTORS and Devices Info for 7899C Robot
+
+/*
+// MOTORS and Devices Info for 7899A Robot
+//drivebase motors
+motor FrontLeft = motor (PORT14, ratio6_1, true);
+motor FrontRight = motor (PORT8, ratio6_1, false);
+motor MiddleLeft = motor (PORT17, ratio6_1, true);
+motor MiddleRight = motor (PORT7, ratio6_1, false);
+motor BackLeft = motor (PORT20, ratio6_1, true);
+motor BackRight = motor (PORT1, ratio6_1, false);
+
+//subsystems
+motor skibiditoilet = motor (PORT9, ratio6_1, false);
+motor ladyblack = motor (PORT4, ratio36_1, true);
+
+//postons
+pneumatics mogoClamp = Brain.ThreeWirePort.A;
+*/
+
 int AutonSelected=0;
 int AutonMin=0;
 int AutonMax=2;
@@ -96,7 +135,7 @@ void autonomous(void) {
       Brain.Screen.drawRectangle(1,20,200,200);
       break;
 }
-
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
