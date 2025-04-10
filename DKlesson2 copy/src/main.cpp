@@ -23,17 +23,34 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT7, ratio6_1, false);
-motor RightMiddle = motor(PORT5, ratio6_1, true);
-motor RightBack = motor(PORT6, ratio6_1, true);
-motor LeftTop = motor(PORT10, ratio6_1, true);
-motor LeftMiddle = motor(PORT9, ratio6_1, false);
-motor LeftBack = motor(PORT8, ratio6_1, false);
+
+
+// motor RightTop = motor(PORT7, ratio6_1, false);
+// motor RightMiddle = motor(PORT5, ratio6_1, true);
+// motor RightBack = motor(PORT6, ratio6_1, true);
+// motor LeftTop = motor(PORT10, ratio6_1, true);
+// motor LeftMiddle = motor(PORT9, ratio6_1, false);
+// motor LeftBack = motor(PORT8, ratio6_1, false);
+
+
+motor RightTop = motor(PORT5, ratio6_1, false);
+motor RightMiddle = motor(PORT8, ratio6_1, false);
+motor RightBack = motor(PORT16, ratio6_1, false);
+motor LeftTop = motor(PORT15, ratio6_1, true);
+motor LeftMiddle = motor(PORT18, ratio6_1, true);
+motor LeftBack = motor(PORT19, ratio6_1, true);
+
+
 //Pneumatics
 pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
-inertial Gyro = inertial(PORT20);
+
+// inertial Gyro = inertial(PORT20);
+
+inertial Gyro = inertial(PORT2);
+
+
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -70,65 +87,84 @@ Brain.Screen.printAt (50,175,"Auton Selected");
 }
 
 void selectAuton(){
-int x= Brain.Screen.xPosition();
-int y= Brain.Screen.yPosition();
+  int x= Brain.Screen.xPosition();
+  int y= Brain.Screen.yPosition();
 
-if(x>=50){
-if(x<=150){
-if(y>=50){
-if(y<=150){
-AutonSelected=AutonSelected+1;
-if(AutonSelected>AutonMax){
-AutonSelected=AutonMin;
-}
-Brain.Screen.printAt(1,200, "Auton Selected =  %d  ",AutonSelected);
-}
-}
+  if(x>=50){
+    if(x<=150){
+      if(y>=50){
+        if(y<=150){
+          AutonSelected=AutonSelected+1;
+          if(AutonSelected>AutonMax){
+            AutonSelected=AutonMin;
+          }
+          Brain.Screen.printAt(1,200, "Auton Selected =  %d  ",AutonSelected);
+      }
+    }
+  }
+
+  }
+  return;
 }
 
-}
-return;
-}
-// Drive Controls
 void drive(int lspeed, int rspeed, int wt){
-LeftBack.spin(forward, lspeed,percent);
-LeftMiddle.spin(forward,lspeed,percent);
-LeftTop.spin(forward,lspeed,percent);
-RightBack.spin(forward,rspeed,percent);
-RightMiddle.spin(forward,rspeed,percent);
-RightTop.spin(forward,rspeed,percent);
-  
-wait(wt,msec);
-}
-// Brakes
-void driveBrake(){
-LeftBack.stop(brake);
-LeftMiddle.stop(brake);
-LeftTop.stop(brake);
-RightBack.stop(brake);
-RightMiddle.stop(brake);
-RightTop.stop(brake);
-}
-// Creating a new function
-float Pi=3.14;
-float D=2.75; // Wheel Diameter
-float G=36.0/48.0;
-void inchDrive(float target){
-LeftBack.setPosition(0,rev);
-float x = 0.0;
-float error=target;
-float accuracy=0.5;
-float kp=7.0;
-float speed=kp*error;
-while(error>accuracy){
-drive(speed,speed,10);
-x=LeftBack.position(rev)*Pi*D*G;
-error=target-x;
+  LeftBack.spin(forward,lspeed,pct);
+  LeftMiddle.spin(forward,lspeed,pct);
+  LeftTop.spin(forward,lspeed,pct);
+
+  RightBack.spin(forward,rspeed,pct);
+  RightMiddle.spin(forward,rspeed,pct);
+  RightTop.spin(forward,rspeed,pct);
+
+  wait(wt,msec);
 }
 
-// Using the driveBreak
+void driveBrake(){
+  LeftBack.stop(brake);
+  LeftMiddle.stop(brake);
+  LeftTop.stop(brake);
+  RightBack.stop(brake);
+  RightMiddle.stop(brake);
+  RightTop.stop(brake);
+}
+float Pi=3.14;
+float D=2.75; //wheel diameter
+float G=36.0/48.0;
+
+
+void inchDrive(float target){
+ LeftBack.setPosition(0,rev);
+ float x = 0.0;
+ float error=target;
+ float accuracy=0.5;
+ float kp=2.0;
+ float speed=kp*error;
+ while(fabs(error)>accuracy){
+  drive(speed,speed,10);
+  x=LeftBack.position(rev)*Pi*D*G;
+  error=target-x;
+ }
 driveBrake();
 }
+
+
+void gyroTurn(float target){
+ float heading=0.0;
+ float error=target-heading;
+ float kp=0.7;
+ float speed = kp*error;
+ float accuracy=0.5;
+ Gyro.setRotation(0.0, degrees);
+ while(fabs(error)>accuracy){
+    drive(speed, -speed, 10);
+    heading=Gyro.rotation(degrees);
+    error=target-heading;
+    speed=kp*error;
+  }
+driveBrake();
+ }
+
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -140,7 +176,7 @@ driveBrake();
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-Brain.Screen.printAt(1,20,"Skibidi Toilet Will Be Mine Yeah");
+Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
 drawGUI();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -157,27 +193,35 @@ drawGUI();
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  Brain.Screen.printAt(1,40,"Ohio Gyatt Rizz");
-switch (AutonSelected) {
-case 0:
-//code 0
-Brain.Screen.drawCircle(200,200,25);
-drive(50,0,500);
-driveBrake();
-break;
-case 1:
-//code 1
-Brain.Screen.clearScreen();
-Brain.Screen.drawLine(1,20,200,200);
-drive(50,50,2000);
-driveBrake();
-break;
-case 2:
-//code 2
-Brain.Screen.clearScreen();
-Brain.Screen.setFillColor(blue);
-Brain.Screen.drawRectangle(1,20,200,200);
-break;
+  Brain.Screen.printAt(1,40,"My Auto is running ");
+  switch (AutonSelected) {
+    case 0:
+      //code 0
+      Brain.Screen.drawCircle(200,200,25);
+      inchDrive(12);
+      gyroTurn(90);
+      wait(20, msec);
+      inchDrive(12);
+      gyroTurn(-90);
+      inchDrive(12);
+      gyroTurn(90);
+      inchDrive(12);
+      gyroTurn(-90);
+
+      break;
+      case 1:
+      //code 1
+      Brain.Screen.clearScreen();
+      Brain.Screen.drawLine(1,20,200,200);
+      drive(50,50,2000);
+      driveBrake();
+      break;
+      case 2:
+      //code 2
+      Brain.Screen.clearScreen();
+      Brain.Screen.setFillColor(blue);
+      Brain.Screen.drawRectangle(1,20,200,200);
+      break;
 }
 }
 /*---------------------------------------------------------------------------*/
@@ -191,35 +235,36 @@ break;
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-Brain.Screen.printAt(1,60,"User is running ");
-// User control code here, inside the loop
-while (1) {
-// This is the main execution loop for the user control program.
-// Each time through the loop your program should update motor + servo
-// values based on feedback from the joysticks.
-// ........................................................................
-// Insert user code here. This is where you use the joystick values to
-// update your motors, etc.
-// ........................................................................
+  Brain.Screen.printAt(1,60,"User is running ");
+  // User control code here, inside the loop
+  while (1) {
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
 
-wait(20, msec); // Sleep the task for a short amount of time to
-// prevent wasted resources.
-}
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
+
+    wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
+  }
 }
 
 //
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-// Set up callbacks for autonomous and driver control periods.
-Competition.autonomous(autonomous);
-Competition.drivercontrol(usercontrol);
+  // Set up callbacks for autonomous and driver control periods.
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 Brain.Screen.pressed(selectAuton);
-// Run the pre-autonomous function.
-pre_auton();
+  // Run the pre-autonomous function.
+  pre_auton();
 
-// Prevent main from exiting with an infinite loop.
-while (true) {
- wait(100, msec);
-}
+  // Prevent main from exiting with an infinite loop.
+  while (true) {
+    wait(100, msec);
+  }
 }
