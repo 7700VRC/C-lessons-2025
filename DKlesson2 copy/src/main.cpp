@@ -90,59 +90,42 @@ void selectAuton(){
   return;
 }
 
-void drive(int lspeed, int rspeed, int wt) {
-  LeftBack.spin(fwd,lspeed,pct);
-  LeftMiddle.spin(fwd,lspeed,pct);
-  LeftTop.spin(fwd,lspeed,pct);
+void drive(int lspeed, int rspeed, int wt){
+  LeftBack.spin(forward,lspeed,pct);
+  LeftMiddle.spin(forward,lspeed,pct);
+  LeftTop.spin(forward,lspeed,pct);
 
-  RightBack.spin(fwd,rspeed,pct);
-  RightMiddle.spin(fwd,rspeed,pct);
-  RightTop.spin(fwd,rspeed,pct);
+  RightBack.spin(forward,rspeed,pct);
+  RightMiddle.spin(forward,rspeed,pct);
+  RightTop.spin(forward,rspeed,pct);
 
   wait(wt,msec);
 }
 
-void driveBrake() {
+void driveBrake(){
   LeftBack.stop(brake);
   LeftMiddle.stop(brake);
   LeftTop.stop(brake);
-
   RightBack.stop(brake);
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
-float Pi = 3.14;
-float D = 2.75; //wheel diameter
-float G = 36.0/48.0;
+float Pi=3.14;
+float D=2.75; //wheel diameter
+float G=36.0/48.0;
 void inchDrive(float target){
-  LeftBack.setPosition(0,rev);
-  float x = 0.0;
-  float error = target;
-  float accuracy = 0.5;
-  float kp = 7.0;
-  float speed = kp*error;
-  while(fabs(error)>accuracy) {
-    drive(speed,speed,10);
-    x=LeftBack.position(rev)*Pi*D*G;
-    error=target-x;
-  }
-  driveBrake();
-}
-
-void gyroTurn(float target){
-  float heading=0.0;
-  float error = target-heading;
-  float kp=5.0;
-  float speed = kp*error;
-  float accuracy=0.5;
-  Gyro.setRotation(0.0,degrees);
-  while(fabs(error)>accuracy){
-    drive(speed, -speed, 10);
-    heading = Gyro.rotation(degrees);
-    error = target-heading;
-    speed=kp*error;
-  }
-  driveBrake();
+ LeftBack.setPosition(0,rev);
+ float x = 0.0;
+ float error=target;
+ float accuracy=0.5;
+ float kp=7.0;
+ float speed=kp*error;
+ while(fabs(error)>accuracy){
+  drive(speed,speed,10);
+  x=LeftBack.position(rev)*Pi*D*G;
+  error=target-x;
+ }
+driveBrake();
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -177,11 +160,6 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(12);
-      gyroTurn(90);
-      inchDrive(12);
-      gyroTurn(90);
-      inchDrive(12);
       break;
       case 1:
       //code 1
@@ -196,9 +174,8 @@ void autonomous(void) {
       Brain.Screen.setFillColor(blue);
       Brain.Screen.drawRectangle(1,20,200,200);
       break;
-  }
 }
-
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -207,7 +184,6 @@ void autonomous(void) {
 /*  a VEX Competition.                                                       */
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
-/*                               9x-7i>3(3x-7u)                              */
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
