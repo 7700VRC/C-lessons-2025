@@ -129,6 +129,21 @@ void inchDrive(float target){
   driveBrake();
 }
 
+void gyroTurn(float target){
+  float heading=0.0;
+  float error = target-heading;
+  float kp=5.0;
+  float speed = kp*error;
+  float accuracy=0.5;
+  Gyro.setRotation(0.0,degrees);
+  while(fabs(error)>accuracy){
+    drive(speed, -speed, 10);
+    heading = Gyro.rotation(degrees);
+    error = target-heading;
+    speed=kp*error;
+  }
+  driveBrake();
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -162,9 +177,11 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(24.0);
-      wait(1000,msec);
-      inchDrive(-24);
+      inchDrive(12);
+      gyroTurn(90);
+      inchDrive(12);
+      gyroTurn(90);
+      inchDrive(12);
       break;
       case 1:
       //code 1
@@ -179,8 +196,9 @@ void autonomous(void) {
       Brain.Screen.setFillColor(blue);
       Brain.Screen.drawRectangle(1,20,200,200);
       break;
+  }
 }
-}
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -189,6 +207,7 @@ void autonomous(void) {
 /*  a VEX Competition.                                                       */
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
+/*                               9x-7i>3(3x-7u)                              */
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
