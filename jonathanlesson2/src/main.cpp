@@ -105,7 +105,7 @@ void selectAuton(){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
+Brain.Screen.printAt(1,20,"Pre Auto is running  >:)");
 drawGUI();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -137,7 +137,7 @@ void inchDrive(float target){
   float x=LeftBack.position(rev)*pi*D*G;
   float error=target;
   float accuracy=0.5;
-  float kp=7;
+  float kp=7.0;
   float speed=kp*error;
   while(fabs(error)>accuracy){
     drive(speed,speed,10);
@@ -147,6 +147,20 @@ void inchDrive(float target){
   driveBrake();
 }
 
+void gyroTurn(float target){
+  float heading = 0.0;
+  float error = target-heading;
+  float kp = 1.0;
+  float speed = kp*error;
+  float accuracy = 0.5;
+  while(fabs(error)>accuracy){
+    drive(speed,-speed,10);
+    heading = Gyro.rotation(degrees);
+    error = target-heading;
+    speed=kp*error;
+  }
+  driveBrake();
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -163,9 +177,11 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(24);
-      wait(1000,msec);
-      inchDrive(-24);
+      inchDrive(36);
+      gyroTurn(90);
+      inchDrive(36);
+      gyroTurn(90);
+      inchDrive(36);
       break;
       case 1:
       //code 1

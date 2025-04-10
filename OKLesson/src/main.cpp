@@ -23,12 +23,12 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT7, ratio6_1, false);
-motor RightMiddle = motor(PORT5, ratio6_1, true);
-motor RightBack = motor(PORT6, ratio6_1, true);
-motor LeftTop = motor(PORT10, ratio6_1, true);
-motor LeftMiddle = motor(PORT9, ratio6_1, false);
-motor LeftBack = motor(PORT8, ratio6_1, false);
+motor RightTop = motor(PORT7, ratio6_1, true);
+motor RightMiddle = motor(PORT5, ratio6_1, false);
+motor RightBack = motor(PORT6, ratio6_1, false);
+motor LeftTop = motor(PORT10, ratio6_1, false);
+motor LeftMiddle = motor(PORT9, ratio6_1, true);
+motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
 pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
@@ -119,9 +119,24 @@ while(fabs(error)>accuracy){
 drive(75,75,10);
 x=LeftBack.position(rev)*Pi*D*G;
 error=target-x;
-
 }
 driveBrake();
+}
+
+void gyroturn(float target){
+  float heading=0.0;
+  float error=target-heading;
+  float kp=5.0;
+  float speed=kp*error;
+  float accuracy=0.5;
+  Gyro.setRotation(0.0,degrees);
+  while(fabs(error)>accuracy){
+    drive(speed,-speed,10);
+    heading=Gyro.rotation(degrees);
+    error=target-heading;
+    speed=kp*error;
+  }
+  driveBrake();
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -156,9 +171,21 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchdrive(24.0);
-      wait(1000,msec);
-      inchdrive(-24.0);
+      inchdrive(36);
+      wait(20,msec);
+      gyroturn(90);
+      wait(20,msec);
+      inchdrive(36);
+      wait(20,msec);
+      gyroturn(90);
+      wait(20,msec);
+      inchdrive(36);
+      wait(20,msec);
+      gyroturn(90);
+      wait(20,msec);
+      inchdrive(36);
+      wait(20,msec);
+      gyroturn(90);
       break;
       case 1:
       //code 1
