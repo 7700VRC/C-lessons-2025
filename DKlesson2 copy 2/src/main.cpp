@@ -130,14 +130,12 @@ void driveBrake(){
 float Pi=3.14;
 float D=2.75; //wheel diameter
 float G=36.0/48.0;
-
-
 void inchDrive(float target){
  LeftBack.setPosition(0,rev);
  float x = 0.0;
  float error=target;
  float accuracy=0.5;
- float kp=2.0;
+ float kp=7.0;
  float speed=kp*error;
  while(fabs(error)>accuracy){
   drive(speed,speed,10);
@@ -151,7 +149,7 @@ driveBrake();
 void gyroTurn(float target){
  float heading=0.0;
  float error=target-heading;
- float kp=0.7;
+ float kp=5.0;
  float speed = kp*error;
  float accuracy=0.5;
  Gyro.setRotation(0.0, degrees);
@@ -198,16 +196,12 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(12);
+      inchDrive(36);
       gyroTurn(90);
       wait(20, msec);
-      inchDrive(12);
+      inchDrive(36);
       gyroTurn(-90);
-      inchDrive(12);
-      gyroTurn(90);
-      inchDrive(12);
-      gyroTurn(-90);
-
+      inchDrive(36);
       break;
       case 1:
       //code 1
