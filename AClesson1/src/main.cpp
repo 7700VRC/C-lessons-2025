@@ -177,11 +177,11 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(36);
+      inchDrive(12);
       gyroTurn(90);
-      inchDrive(36);
+      inchDrive(12);
       gyroTurn(90);
-      inchDrive(36);
+      inchDrive(12);
       break;
       case 1:
       //code 1
