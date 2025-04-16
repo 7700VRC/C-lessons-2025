@@ -23,12 +23,12 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT7, ratio6_1, true);
-motor RightMiddle = motor(PORT5, ratio6_1, false);
-motor RightBack = motor(PORT6, ratio6_1, false);
-motor LeftTop = motor(PORT10, ratio6_1, false);
-motor LeftMiddle = motor(PORT9, ratio6_1, true);
-motor LeftBack = motor(PORT8, ratio6_1, true);
+motor RightTop = motor(PORT7, ratio6_1, false);
+motor RightMiddle = motor(PORT5, ratio6_1, true);
+motor RightBack = motor(PORT6, ratio6_1, true);
+motor LeftTop = motor(PORT10, ratio6_1, true);
+motor LeftMiddle = motor(PORT9, ratio6_1, false);
+motor LeftBack = motor(PORT8, ratio6_1, false);
 //Pneumatics
 pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
@@ -89,20 +89,14 @@ void selectAuton(){
   }
   return;
 }
-
-void drive(int lspeed, int rspeed, int wt){
-  LeftBack.spin(forward,lspeed,pct);
-  LeftMiddle.spin(forward,lspeed,pct);
-  LeftTop.spin(forward,lspeed,pct);
-
-
-  RightBack.spin(forward,rspeed,pct);
-  RightMiddle.spin(forward,rspeed,pct);
-  RightTop.spin(forward,rspeed,pct);
-
-  wait(wt,msec);
+void drive(int lspeed,int rspeed,int wt){
+  LeftBack.spin(fwd,lspeed,pct);
+  LeftMiddle.spin(fwd,lspeed,pct);
+  LeftTop.spin(fwd,lspeed,pct);
+  RightBack.spin(fwd,rspeed,pct);
+  RightMiddle.spin(fwd,rspeed,pct);
+  RightTop.spin(fwd,rspeed,pct);
 }
-
 void driveBrake(){
   LeftBack.stop(brake);
   LeftMiddle.stop(brake);
@@ -111,43 +105,38 @@ void driveBrake(){
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
-float Pi=3.14159;
+float Pi=3.14159265;
 float D=2.75; //wheel diameter
 float G=36.0/48.0;
-void inchDrive(float target){
-  LeftBack.setPosition(0,rev);
-  float x = 0.0;
-  float error=target;
-  float accuracy=0.5;
-  float kp=4.0;
-  float speed=kp*error;
-  while(fabs(error)>accuracy){
-    drive(speed,speed,10);
-    x=LeftBack.position(rev)*Pi*D*G;
-    error=target-x;
+void inchdrive(float target){
+LeftBack.setPosition(0,rev);
+float x=0.0;
+float error=target;
+float accuracy=0.5;
+float kp=7.0;
+float speed=kp*error;
+while(fabs(error)>accuracy){
+drive(75,75,10);
+x=LeftBack.position(rev)*Pi*D*G;
+error=target-x;
+
 }
 driveBrake();
 }
-
 void gyroTurn(float target){
-  float heading=0.0;
-  float error= target-heading;
-  float kp=0.7;
-  float speed=kp*error;
-  float accuracy=0.5;
-  Gyro.setRotation(0.0,degrees);
-  while(fabs(error)>accuracy){
-  drive (speed,-speed,10);
+float heading=0.0;
+float error=target-heading;
+float kp=5.0;
+float speed=kp*error;
+float accuracy=0.5;
+while(fabs(error)>accuracy){
+}
+while(true){
+  drive(speed,-speed,10);
   heading=Gyro.rotation(degrees);
   error=target-heading;
   speed=kp*error;
 }
-
-
-
-
-
-
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -178,20 +167,18 @@ drawGUI();
 
 void autonomous(void) {
   Brain.Screen.printAt(1,40,"My Auto is running ");
-  switch (AutonSelected) {
+  switch (0) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(15);
+      inchdrive(36);
       gyroTurn(90);
-      inchDrive(15);
+      inchdrive(36);
       gyroTurn(90);
-      inchDrive(15);
-      gyroTurn(90);
-      inchDrive(15);
-      gyroTurn(90);
+      inchdrive(36);
+      inchdrive(30);
+      gyroTurn(4572385978452705);
       break;
-      //
       case 1:
       //code 1
       Brain.Screen.clearScreen();
@@ -251,6 +238,3 @@ Brain.Screen.pressed(selectAuton);
     wait(100, msec);
   }
 }
-
-//aio aio aio {the cat is spinning🐈😵‍💫}(The sigma is mewing🤫🧏);//
-//Zach is hacking??

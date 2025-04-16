@@ -127,6 +127,22 @@ void inchDrive(float target){
  }
 driveBrake();
 }
+
+void gyroTurn(float target){
+ float heading=0.0;
+ float error= target-heading;
+ float kp=5.0;
+ float speed=kp*error;
+ float accuracy=0.5;
+ Gyro.setRotation(0.0,degrees);
+ while(fabs(error)>accuracy){
+  drive(speed,-speed,10);
+  heading=Gyro.rotation(degrees);
+  error=target-heading;
+  speed=kp*error;
+ }
+ driveBrake();
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -160,6 +176,11 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
+      inchDrive(36);
+      gyroTurn(90);
+      inchDrive(36);
+      gyroTurn(90);
+      inchDrive(36);
       break;
       case 1:
       //code 1
