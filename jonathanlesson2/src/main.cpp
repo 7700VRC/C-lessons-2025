@@ -137,20 +137,34 @@ void inchDrive(float target){
   float x=LeftBack.position(rev)*pi*D*G;
   float error=target;
   float accuracy=0.5;
-  float kp=7.0;
+  float kp=5.5;
   float speed=kp*error;
+  float heading=0.0;
+  Gyro.resetHeading();
+  float gyro=Gyro.rotation(degrees);
+  float correction=heading-gyro;
   while(fabs(error)>accuracy){
-    drive(speed,speed,10);
     float x=LeftBack.position(rev)*pi*D*G;
     error=target-x;
+    speed=kp*error;
+    if(speed>100){
+      speed=100;
+    }
+    if(speed<-100){
+      speed=-100;
+    }
+    float gyro=Gyro.rotation(degrees);
+    float correction=heading-gyro;
+    drive(speed+correction,speed-correction,10);
   }
   driveBrake();
+  wait(250,msec);
 }
 
 void gyroTurn(float target){
   float heading = 0.0;
   float error = target-heading;
-  float kp = 1.0;
+  float kp = 0.7;
   float speed = kp*error;
   float accuracy = 0.5;
   while(fabs(error)>accuracy){
@@ -160,6 +174,7 @@ void gyroTurn(float target){
     speed=kp*error;
   }
   driveBrake();
+  wait(250,msec);
 }
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -177,11 +192,7 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(36);
       gyroTurn(90);
-      inchDrive(36);
-      gyroTurn(90);
-      inchDrive(36);
       break;
       case 1:
       //code 1
