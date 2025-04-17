@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       georgekirkman                                             */
+/*    Author:       skibidy                                         */
 /*    Created:      3/26/2025, 4:17:27 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
@@ -23,17 +23,17 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT7, ratio6_1, false);
-motor RightMiddle = motor(PORT5, ratio6_1, true);
-motor RightBack = motor(PORT6, ratio6_1, true);
-motor LeftTop = motor(PORT10, ratio6_1, true);
-motor LeftMiddle = motor(PORT9, ratio6_1, false);
-motor LeftBack = motor(PORT8, ratio6_1, false);
+motor RightTop = motor(PORT5, ratio6_1, false);
+motor RightMiddle = motor(PORT8, ratio6_1, false);
+motor RightBack = motor(PORT16, ratio6_1, false);
+motor LeftTop = motor(PORT15, ratio6_1, true);
+motor LeftMiddle = motor(PORT18, ratio6_1, true);
+motor LeftBack = motor(PORT19, ratio6_1, true);
 //Pneumatics
 pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
-inertial Gyro = inertial(PORT20);
+inertial Gyro = inertial(PORT2);
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -57,7 +57,7 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
 */
 
-int AutonSelected=0;
+int AutonSelected=1;
 int AutonMin=0;
 int AutonMax=2;
 
@@ -110,7 +110,7 @@ void driveBrake(){
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
-float Pi=3.14;
+float Pi=3.14;  
 float D=2.75; //wheel diameter
 float G=36.0/48.0;
 void inchDrive(float target){
@@ -131,7 +131,7 @@ driveBrake();
 void gyroTurn(float target){
  float heading=0.0;
  float error= target-heading;
- float kp=5.0;
+ float kp=0.7;
  float speed=kp*error;
  float accuracy=0.5;
  Gyro.setRotation(0.0,degrees);
@@ -175,25 +175,23 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      Brain.Screen.drawCircle(200,200,25);
-      inchDrive(36);
+      inchDrive(10);
       gyroTurn(90);
-      inchDrive(36);
-      gyroTurn(90);
-      inchDrive(36);
+      inchDrive(-31);
       break;
       case 1:
       //code 1
       Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
-      drive(50,50,2000);
-      driveBrake();
+      inchDrive(6);
+      gyroTurn(135);
+      wait(1, sec);
+      inchDrive(-40);
       break;
       case 2:
       //code 2
       Brain.Screen.clearScreen();
-      Brain.Screen.setFillColor(blue);
-      Brain.Screen.drawRectangle(1,20,200,200);
+      inchDrive(96);
+      gyroTurn(-90);
       break;
 }
 }
