@@ -23,34 +23,17 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-
-
-// motor RightTop = motor(PORT7, ratio6_1, false);
-// motor RightMiddle = motor(PORT5, ratio6_1, true);
-// motor RightBack = motor(PORT6, ratio6_1, true);
-// motor LeftTop = motor(PORT10, ratio6_1, true);
-// motor LeftMiddle = motor(PORT9, ratio6_1, false);
-// motor LeftBack = motor(PORT8, ratio6_1, false);
-
-
-motor RightTop = motor(PORT5, ratio6_1, false);
-motor RightMiddle = motor(PORT8, ratio6_1, false);
-motor RightBack = motor(PORT16, ratio6_1, false);
-motor LeftTop = motor(PORT15, ratio6_1, true);
-motor LeftMiddle = motor(PORT18, ratio6_1, true);
-motor LeftBack = motor(PORT19, ratio6_1, true);
-
-
+motor RightTop = motor(PORT7, ratio6_1, true);
+motor RightMiddle = motor(PORT5, ratio6_1, false);
+motor RightBack = motor(PORT6, ratio6_1, false);
+motor LeftTop = motor(PORT10, ratio6_1, false);
+motor LeftMiddle = motor(PORT9, ratio6_1, true);
+motor LeftBack = motor(PORT8, ratio6_1,true);
 //Pneumatics
 pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
-
-// inertial Gyro = inertial(PORT20);
-
-inertial Gyro = inertial(PORT2);
-
-
+inertial Gyro = inertial(PORT20);
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -145,24 +128,21 @@ void inchDrive(float target){
 driveBrake();
 }
 
-
 void gyroTurn(float target){
  float heading=0.0;
- float error=target-heading;
+ float error= target-heading;
  float kp=5.0;
- float speed = kp*error;
+ float speed=kp*error;
  float accuracy=0.5;
- Gyro.setRotation(0.0, degrees);
+ Gyro.setRotation(0.0,degrees);
  while(fabs(error)>accuracy){
-    drive(speed, -speed, 10);
-    heading=Gyro.rotation(degrees);
-    error=target-heading;
-    speed=kp*error;
-  }
-driveBrake();
+  drive(speed,-speed,10);
+  heading=Gyro.rotation(degrees);
+  error=target-heading;
+  speed=kp*error;
  }
-
-
+ driveBrake();
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -196,12 +176,11 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(36);
+      inchDrive(6);
       gyroTurn(90);
-      wait(20, msec);
-      inchDrive(36);
-      gyroTurn(-90);
-      inchDrive(36);
+      inchDrive(12);
+      gyroTurn(90);
+      inchDrive(12);
       break;
       case 1:
       //code 1
