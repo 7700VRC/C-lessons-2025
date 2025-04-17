@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       jonathan xu                                               */
-/*    Created:      4/2/2025, 4:??:?? PM                                      */
+/*    Author:       georgekirkman                                             */
+/*    Created:      3/26/2025, 4:17:27 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
@@ -28,7 +28,7 @@ motor RightMiddle = motor(PORT5, ratio6_1, false);
 motor RightBack = motor(PORT6, ratio6_1, false);
 motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
-motor LeftBack = motor(PORT8, ratio6_1, true);
+motor LeftBack = motor(PORT8, ratio6_1,true);
 //Pneumatics
 pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
@@ -56,11 +56,6 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 //postons
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
 */
-//random numbers
-float pi=3.1415926535897932384626433832795028841971693993751058;
-float D=2.75;
-float G=36.0/48.0;
-
 
 int AutonSelected=0;
 int AutonMin=0;
@@ -94,6 +89,60 @@ void selectAuton(){
   }
   return;
 }
+
+void drive(int lspeed, int rspeed, int wt){
+  LeftBack.spin(forward,lspeed,pct);
+  LeftMiddle.spin(forward,lspeed,pct);
+  LeftTop.spin(forward,lspeed,pct);
+
+  RightBack.spin(forward,rspeed,pct);
+  RightMiddle.spin(forward,rspeed,pct);
+  RightTop.spin(forward,rspeed,pct);
+
+  wait(wt,msec);
+}
+
+void driveBrake(){
+  LeftBack.stop(brake);
+  LeftMiddle.stop(brake);
+  LeftTop.stop(brake);
+  RightBack.stop(brake);
+  RightMiddle.stop(brake);
+  RightTop.stop(brake);
+}
+float Pi=3.14;
+float D=2.75; //wheel diameter
+float G=36.0/48.0;
+void inchDrive(float target){
+ LeftBack.setPosition(0,rev);
+ float x = 0.0;
+ float error=target;
+ float accuracy=0.5;
+ float kp=7.0;
+ float speed=kp*error;
+ while(fabs(error)>accuracy){
+  drive(speed,speed,10);
+  x=LeftBack.position(rev)*Pi*D*G;
+  error=target-x;
+ }
+driveBrake();
+}
+
+void gyroTurn(float target){
+ float heading=0.0;
+ float error= target-heading;
+ float kp=5.0;
+ float speed=kp*error;
+ float accuracy=0.5;
+ Gyro.setRotation(0.0,degrees);
+ while(fabs(error)>accuracy){
+  drive(speed,-speed,10);
+  heading=Gyro.rotation(degrees);
+  error=target-heading;
+  speed=kp*error;
+ }
+ driveBrake();
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -105,77 +154,12 @@ void selectAuton(){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-Brain.Screen.printAt(1,20,"Pre Auto is running  >:)");
+Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
 drawGUI();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
 
-
-void drive(int lspeed, int rspeed, int wt){
- //left motors
-  LeftBack.spin(fwd,lspeed,pct);
-  LeftMiddle.spin(fwd,lspeed,pct);
-  LeftTop.spin(fwd,lspeed,pct);
- //right motors
-  RightBack.spin(fwd,rspeed,pct);
-  RightMiddle.spin(fwd,rspeed,pct);
-  RightTop.spin(fwd,rspeed,pct);
-  //wait
-  wait(wt,msec);
-}
-void driveBrake(){
-  LeftBack.stop(brake);
-  LeftMiddle.stop(brake);
-  LeftTop.stop(brake);
-  RightBack.stop(brake);
-  RightMiddle.stop(brake);
-  RightTop.stop(brake);
-}
-void inchDrive(float target){
-  LeftBack.setPosition(0,rev);
-  float x=LeftBack.position(rev)*pi*D*G;
-  float error=target;
-  float accuracy=0.5;
-  float kp=5.5;
-  float speed=kp*error;
-  float heading=0.0;
-  Gyro.resetHeading();
-  float gyro=Gyro.rotation(degrees);
-  float correction=heading-gyro;
-  while(fabs(error)>accuracy){
-    float x=LeftBack.position(rev)*pi*D*G;
-    error=target-x;
-    speed=kp*error;
-    if(speed>100){
-      speed=100;
-    }
-    if(speed<-100){
-      speed=-100;
-    }
-    float gyro=Gyro.rotation(degrees);
-    float correction=heading-gyro;
-    drive(speed+correction,speed-correction,10);
-  }
-  driveBrake();
-  wait(250,msec);
-}
-
-void gyroTurn(float target){
-  float heading = 0.0;
-  float error = target-heading;
-  float kp = 0.7;
-  float speed = kp*error;
-  float accuracy = 0.5;
-  while(fabs(error)>accuracy){
-    drive(speed,-speed,10);
-    heading = Gyro.rotation(degrees);
-    error = target-heading;
-    speed=kp*error;
-  }
-  driveBrake();
-  wait(250,msec);
-}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -192,12 +176,18 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
+      inchDrive(6);
       gyroTurn(90);
+      inchDrive(12);
+      gyroTurn(90);
+      inchDrive(12);
       break;
       case 1:
       //code 1
       Brain.Screen.clearScreen();
       Brain.Screen.drawLine(1,20,200,200);
+      drive(50,50,2000);
+      driveBrake();
       break;
       case 2:
       //code 2
@@ -207,7 +197,6 @@ void autonomous(void) {
       break;
 }
 }
-
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -222,7 +211,17 @@ void usercontrol(void) {
   Brain.Screen.printAt(1,60,"User is running ");
   // User control code here, inside the loop
   while (1) {
-    wait(20, msec);
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
+
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
+
+    wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
   }
 }
 
