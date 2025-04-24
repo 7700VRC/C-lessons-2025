@@ -30,7 +30,7 @@ motor LeftTop = motor(PORT10, ratio6_1, true);
 motor LeftMiddle = motor(PORT9, ratio6_1, false);
 motor LeftBack = motor(PORT8, ratio6_1, false);
 //Pneumatics
-pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
+digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
 inertial Gyro = inertial(PORT20);
@@ -143,6 +143,17 @@ void gyroTurn(float target){
  }
  driveBrake();
 }
+
+void closeClamp(){
+  Clamp.set(true);
+}
+void openClamp(){
+  Clamp.set(false); 
+}
+
+void toggleClamp(){
+Clamp.set(!Clamp.value());
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -156,6 +167,10 @@ void gyroTurn(float target){
 void pre_auton(void) {
 Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
 drawGUI();
+wait(2000, msec);
+toggleClamp();
+wait(200, msec);
+openClamp();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -179,8 +194,12 @@ void autonomous(void) {
       inchDrive(36);
       gyroTurn(90);
       inchDrive(36);
+      wait(100,msec);
+      closeClamp();
+      wait(100,msec);
       gyroTurn(90);
       inchDrive(36);
+      toggleClamp();
       break;
       case 1:
       //code 1
