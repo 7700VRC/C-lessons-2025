@@ -30,8 +30,8 @@ motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
-pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
-pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
+digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
+digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
 //Gyro
 inertial Gyro = inertial(PORT20);
 //Potentiometer
@@ -94,6 +94,21 @@ void selectAuton(){
   }
   return;
 }
+void closeClamp(){
+  Clamp.set(true);
+}
+
+void openClamp(){
+  Clamp.set(false);
+}
+
+void toggleClamp(){
+  Clamp.set(!Clamp.value());
+}
+
+void doinker(){
+  Doinker.set(!Doinker.value());
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -107,6 +122,7 @@ void selectAuton(){
 void pre_auton(void) {
 Brain.Screen.printAt(1,20,"Pre Auto is running  >:)");
 drawGUI();
+wait(2000,msec); 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -137,20 +153,36 @@ void inchDrive(float target){
   float x=LeftBack.position(rev)*pi*D*G;
   float error=target;
   float accuracy=0.5;
-  float kp=7.0;
+  float kp=4.0;
   float speed=kp*error;
+  float heading=0.0;
+  float cc=0.756;
+  Gyro.resetHeading();
+  Gyro.setRotation(0.0,degrees);
+  float gyro=Gyro.rotation(degrees);
+  float correction=heading-gyro;
   while(fabs(error)>accuracy){
-    drive(speed,speed,10);
     float x=LeftBack.position(rev)*pi*D*G;
     error=target-x;
+    speed=kp*error;
+    if(speed>100){
+      speed=100;
+    }
+    if(speed<-100){
+      speed=-100;
+    }
+    float gyro=Gyro.rotation(degrees);
+    float correction=heading-gyro;
+    drive(speed+(correction*cc),speed-(correction*cc),10);
   }
   driveBrake();
+  wait(250,msec);
 }
 
 void gyroTurn(float target){
   float heading = 0.0;
   float error = target-heading;
-  float kp = 1.0;
+  float kp = 0.7;
   float speed = kp*error;
   float accuracy = 0.5;
   while(fabs(error)>accuracy){
@@ -160,7 +192,10 @@ void gyroTurn(float target){
     speed=kp*error;
   }
   driveBrake();
+  wait(250,msec);
 }
+
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -177,11 +212,15 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(36);
+      inchDrive(-48);
+      inchDrive(-48);
+      closeClamp();
+      wait(250,msec);
+      gyroTurn(-45);
+      inchDrive(68);
       gyroTurn(90);
-      inchDrive(36);
-      gyroTurn(90);
-      inchDrive(36);
+      inchDrive(45);
+
       break;
       case 1:
       //code 1
@@ -210,8 +249,12 @@ void autonomous(void) {
 void usercontrol(void) {
   Brain.Screen.printAt(1,60,"User is running ");
   // User control code here, inside the loop
-  while (1) {
-    wait(20, msec);
+  while (true) {
+    float lstick=Controller1.Axis3.position();
+    float sstick=Controller1.Axis1.position();
+
+    drive(lstick+sstick,lstick-sstick,10);
+
   }
 }
 

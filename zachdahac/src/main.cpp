@@ -23,17 +23,17 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT7, ratio6_1, true);
-motor RightMiddle = motor(PORT5, ratio6_1, false);
-motor RightBack = motor(PORT6, ratio6_1, false);
-motor LeftTop = motor(PORT10, ratio6_1, false);
-motor LeftMiddle = motor(PORT9, ratio6_1, true);
-motor LeftBack = motor(PORT8, ratio6_1, true);
+motor RightTop = motor(PORT5, ratio6_1, false);//
+motor RightMiddle = motor(PORT8, ratio6_1, false);
+motor RightBack = motor(PORT16, ratio6_1, false);
+motor LeftTop = motor(PORT15, ratio6_1, true);
+motor LeftMiddle = motor(PORT18, ratio6_1, true);
+motor LeftBack = motor(PORT19, ratio6_1, true);
 //Pneumatics
-pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
+digital_out  Clamp = digital_out(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
-inertial Gyro = inertial(PORT20);
+inertial Gyro = inertial(PORT2);
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -142,12 +142,17 @@ void gyroTurn(float target){
   error=target-heading;
   speed=kp*error;
 }
+driveBrake();
+}
+void closeClamp(){
+  Clamp.set(true);
+}
+void openClamp(){
+  Clamp.set(false);
+}
 
-
-
-
-
-
+void toggleClamp(){
+Clamp.set(!Clamp.value());
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -162,6 +167,10 @@ void gyroTurn(float target){
 void pre_auton(void) {
 Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
 drawGUI();
+wait(2000,msec);
+toggleClamp();
+wait(200,msec);
+openClamp();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -182,16 +191,15 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(15);
-      gyroTurn(90);
-      inchDrive(15);
-      gyroTurn(90);
-      inchDrive(15);
-      gyroTurn(90);
-      inchDrive(15);
-      gyroTurn(90);
+      inchDrive(-84);
+      wait(1000, msec);
+      closeClamp();
+      wait(1000, msec);
+      gyroTurn(45);
+      inchDrive(-24);
+      wait(1000, msec);
+      openClamp();
       break;
-      //
       case 1:
       //code 1
       Brain.Screen.clearScreen();
@@ -227,7 +235,7 @@ void usercontrol(void) {
 
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
+    // update your giga chad motors, etc.
     // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
@@ -252,5 +260,7 @@ Brain.Screen.pressed(selectAuton);
   }
 }
 
-//aio aio aio {the cat is spinning🐈😵‍💫}(The sigma is mewing🤫🧏);//
-//Zach is hacking??
+//-------------------------------------------------------------;//
+//oia oia oia {the cat is spinning🐈😵‍💫}(The sigma is mewing🤫🧏);//
+//Zach is hacking??;//
+//------------------------------------------------------------;//
