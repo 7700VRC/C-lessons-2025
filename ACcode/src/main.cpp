@@ -23,12 +23,12 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT5, ratio6_1, false);
-motor RightMiddle = motor(PORT8, ratio6_1, false);
-motor RightBack = motor(PORT16, ratio6_1, false);
-motor LeftTop = motor(PORT15, ratio6_1, true);
-motor LeftMiddle = motor(PORT18, ratio6_1, true);
-motor LeftBack = motor(PORT19, ratio6_1, true);
+motor RightTop = motor(PORT7, ratio6_1, true);
+motor RightMiddle = motor(PORT5, ratio6_1, false);
+motor RightBack = motor(PORT6, ratio6_1, false);
+motor LeftTop = motor(PORT10, ratio6_1, false);
+motor LeftMiddle = motor(PORT9, ratio6_1, true);
+motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
@@ -38,7 +38,7 @@ inertial Gyro = inertial(PORT2);
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
 //END-- MOTORS and Devices Info for 7899C Robot
-
+//hi
 /*
 // MOTORS and Devices Info for 7899A Robot
 //drivebase motors
@@ -57,7 +57,7 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
 */
 
-int AutonSelected=1;
+int AutonSelected=0;
 int AutonMin=0;
 int AutonMax=2;
 
@@ -89,6 +89,8 @@ void selectAuton(){
   }
   return;
 }
+
+
 
 void drive(int lspeed, int rspeed, int wt){
   LeftBack.spin(forward,lspeed,pct);
@@ -128,6 +130,26 @@ void inchDrive(float target){
 driveBrake();
 }
 
+float r=12.0;
+void arcDrive(float R, float angle){
+  float TargetL= 2*Pi*(R+r)*angle/360;
+  float errorL=TargetL;
+  float kp=2.0;
+  float accuracy = 0.5;
+  float s=0.0;
+  float rspeed;
+  float lspeed;
+  while(fabs(errorL)>accuracy){
+    lspeed=kp*errorL;
+    if(lspeed>100) lspeed=100;
+    if(lspeed<100) lspeed=-100;
+    rspeed=lspeed*R/(R+r);
+    drive(lspeed, rspeed, 10);
+    s=LeftMiddle.position(rev)*Pi*D*G;
+    errorL=TargetL-s;
+  }
+  driveBrake();
+}
 void gyroTurn(float target){
  float heading=0.0;
  float error= target-heading;
@@ -189,13 +211,9 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      inchDrive(36);
-      gyroTurn(90);
-      inchDrive(36);
-      wait(100, msec);
-      closeClamp();
-      gyroTurn(90);
-      inchDrive(36);
+      arcDrive(24,90);
+      wait(500, msec);
+      inchDrive(12);
       break;
       case 1:
       //code 1
@@ -234,9 +252,7 @@ void usercontrol(void) {
   }
 }
 
-//
 // Main will set up the competition functions and callbacks.
-//
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
@@ -250,3 +266,5 @@ int main() {
     wait(100, msec);
   }
 }
+//iicbtbhowytomicdaaicelhtlwistwylwhliticdaaicelhtllylyiatimbbbistitcitysgbinlylaygijayiwtikwmytiss
+//dynhigqwtneamyaasdydlamtwidnrohydftsotbpltyhasnssspbbbohiwywuodrtmcylaljlmstwittyocwrtasaatmhaislalbtyfitcilyfts - wagtdlimbsittbutlidmabihtgtomcityttwittyocwrtasaatmhaislalbdyfitcilyfts - cilyjtoyikilyfts
