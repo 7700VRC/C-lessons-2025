@@ -4,11 +4,11 @@
 /*    Author:       georgekirkman                                             */
 /*    Created:      3/26/2025, 4:17:27 PM                                     */
 /*    Description:  V5 project                                                */
+/*    Belongs To:   Zach                                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
-
 using namespace vex;
 
 // A global instance of competition
@@ -23,12 +23,12 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT5, ratio6_1, false);//
-motor RightMiddle = motor(PORT8, ratio6_1, false);
-motor RightBack = motor(PORT16, ratio6_1, false);
-motor LeftTop = motor(PORT15, ratio6_1, true);
-motor LeftMiddle = motor(PORT18, ratio6_1, true);
-motor LeftBack = motor(PORT19, ratio6_1, true);
+motor RightTop = motor(PORT7, ratio6_1, false);//
+motor RightMiddle = motor(PORT5, ratio6_1, false);
+motor RightBack = motor(PORT6, ratio6_1, false);
+motor LeftTop = motor(PORT10, ratio6_1, true);
+motor LeftMiddle = motor(PORT9, ratio6_1, true);
+motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
 digital_out  Clamp = digital_out(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
@@ -114,6 +114,7 @@ void driveBrake(){
 float Pi=3.14159;
 float D=2.75; //wheel diameter
 float G=36.0/48.0;
+float r=12.0;
 void inchDrive(float target){
   LeftBack.setPosition(0,rev);
   float x = 0.0;
@@ -125,6 +126,28 @@ void inchDrive(float target){
     drive(speed,speed,10);
     x=LeftBack.position(rev)*Pi*D*G;
     error=target-x;
+}
+driveBrake();
+}
+
+//float r =12.0/24.0;
+void arcDrive(float R, float angle){
+
+float TargetL=2*Pi*(R+r)*angle/360;
+float errorL=TargetL;
+float Kp=5.0;
+float acurracy = 0.5;
+float s=0.0;
+float rspeed;
+float lspeed;
+while(fabs(errorL)>acurracy){
+rspeed=Kp*errorL;
+if(rspeed>100) rspeed=100;
+if(rspeed<-100) rspeed=-100;
+rspeed=lspeed*(r+R);
+s=LeftMiddle.position(rev)*Pi*D*G;
+errorL=TargetL-s;
+
 }
 driveBrake();
 }
@@ -190,6 +213,7 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
+
       Brain.Screen.drawCircle(200,200,25);
       inchDrive(-84);
       wait(1000, msec);
@@ -260,7 +284,12 @@ Brain.Screen.pressed(selectAuton);
   }
 }
 
-//-------------------------------------------------------------;//
-//oia oia oia {the cat is spinning🐈😵‍💫}(The sigma is mewing🤫🧏);//
-//Zach is hacking??;//
-//------------------------------------------------------------;//
+/*--------------------------------------------------------------*/
+/*                                                              */
+/*                       Brain rot phase                        */
+/*                                                              */
+/*                                                              */
+/* oia oia oia {the cat is spinning🐈😵‍💫}(The sigma is mewing🤫🧏 */
+/*Zach is hacking???                                            */
+/*                                                              */
+/*--------------------------------------------------------------*/
