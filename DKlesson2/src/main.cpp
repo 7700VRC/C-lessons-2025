@@ -23,17 +23,17 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT5, ratio6_1, false);
-motor RightMiddle = motor(PORT8, ratio6_1, false);
-motor RightBack = motor(PORT16, ratio6_1, false);
-motor LeftTop = motor(PORT15, ratio6_1, true);
-motor LeftMiddle = motor(PORT18, ratio6_1, true);
-motor LeftBack = motor(PORT19, ratio6_1, true);
+motor RightTop = motor(PORT7, ratio6_1, true);
+motor RightMiddle = motor(PORT5, ratio6_1, false);
+motor RightBack = motor(PORT6, ratio6_1, false);
+motor LeftTop = motor(PORT10, ratio6_1, false);
+motor LeftMiddle = motor(PORT9, ratio6_1, true);
+motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
-inertial Gyro = inertial(PORT2);
+inertial Gyro = inertial(PORT20);
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -110,9 +110,12 @@ void driveBrake(){
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
+
 float Pi=3.14;  
 float D=2.75; //wheel diameter
 float G=36.0/48.0;
+
+
 void inchDrive(float target){
  LeftBack.setPosition(0,rev);
  float x = 0.0;
@@ -128,6 +131,26 @@ void inchDrive(float target){
 driveBrake();
 }
 
+float r=12.0;
+void arcDrive(float R, float angle){
+float TargetL= 2*Pi*(R+r)*angle/360;
+float errorL=TargetL;
+float kp=1.0;
+float accuracy = 0.5;
+float s=0.0;
+float rspeed;
+float lspeed;
+while(fabs(errorL)>accuracy){
+lspeed=kp*errorL;
+if(lspeed>100) lspeed=100;
+if (lspeed<-100) lspeed=-100;
+rspeed=lspeed*R/(R+r);
+drive(lspeed,rspeed,10);
+s=LeftMiddle.position(rev)*Pi*D*G;
+errorL=TargetL-s;
+}
+driveBrake();
+}
 void gyroTurn(float target){
  float heading=0.0;
  float error= target-heading;
@@ -190,15 +213,10 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      inchDrive(10);
-      gyroTurn(90);
-      inchDrive(36);
-      wait(100,msec);
-      closeClamp();
-      wait(100,msec);
-      gyroTurn(90);
-      inchDrive(36);
-      toggleClamp();
+      wait(500,msec);
+      arcDrive(24,90);
+      wait(500,msec);
+      inchDrive(12);
       break;
       case 1:
       //code 1
