@@ -57,10 +57,11 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
 */
 //random numbers
+
 float pi=3.1415926535897932384626433832795028841971693993751058;
 float D=2.75;
 float G=36.0/48.0;
-
+float r=12.0;
 
 int AutonSelected=0;
 int AutonMin=0;
@@ -148,6 +149,7 @@ void driveBrake(){
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
+//inchdrive with heading correction cuz im goated that way
 void inchDrive(float target){
   LeftBack.setPosition(0,rev);
   float x=LeftBack.position(rev)*pi*D*G;
@@ -156,11 +158,10 @@ void inchDrive(float target){
   float kp=4.0;
   float speed=kp*error;
   float heading=0.0;
-  float cc=0.756;
   Gyro.resetHeading();
   Gyro.setRotation(0.0,degrees);
   float gyro=Gyro.rotation(degrees);
-  float correction=heading-gyro;
+  float correction=(heading-gyro)*0.75;
   while(fabs(error)>accuracy){
     float x=LeftBack.position(rev)*pi*D*G;
     error=target-x;
@@ -173,7 +174,7 @@ void inchDrive(float target){
     }
     float gyro=Gyro.rotation(degrees);
     float correction=heading-gyro;
-    drive(speed+(correction*cc),speed-(correction*cc),10);
+    drive(speed+correction,speed-correction,10);
   }
   driveBrake();
   wait(250,msec);
@@ -195,6 +196,31 @@ void gyroTurn(float target){
   wait(250,msec);
 }
 
+void arcTurn(float R, float angle){
+  float targetL=pi*D*angle*(r+R)/360;
+  float s=LeftMiddle.position(rev)*pi*D*G;
+  float errorL=targetL-s;
+  float kp=4.0;
+  float accuracy=0.5;
+  float lspeed=kp*errorL;
+  float rspeed=lspeed/(r+R)/R;
+  while(fabs(errorL)>accuracy){
+    if(lspeed>100) lspeed=100;
+    if (lspeed<-100) lspeed=-100;
+    drive(lspeed,rspeed,10);
+    float s=LeftMiddle.position(rev)*pi*D*G;
+    errorL=targetL-s;
+    float rspeed=kp*errorL;
+    float lspeed=rspeed*(r+R)/R;
+  }
+  driveBrake();
+}
+//   {}    ___       {}
+//---[]---/ []    ---[]---  
+//   /\              /\                                                                                                                                                                                               \
+//  /  \            /  \                                                                                                                                                                                              \
+//
+//
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -212,15 +238,8 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(-48);
-      inchDrive(-48);
-      closeClamp();
-      wait(250,msec);
-      gyroTurn(-45);
-      inchDrive(68);
-      gyroTurn(90);
-      inchDrive(45);
-
+      arcTurn(24,90);
+      inchDrive(12);
       break;
       case 1:
       //code 1
@@ -274,3 +293,4 @@ Brain.Screen.pressed(selectAuton);
     wait(100, msec);
   }
 }
+//  
