@@ -30,8 +30,8 @@ motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
-pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
-pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
+digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
+digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
 //Gyro
 inertial Gyro = inertial(PORT20);
 //Potentiometer
@@ -57,10 +57,11 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
 */
 //random numbers
+
 float pi=3.1415926535897932384626433832795028841971693993751058;
 float D=2.75;
 float G=36.0/48.0;
-
+float r=12.0;
 
 int AutonSelected=0;
 int AutonMin=0;
@@ -94,6 +95,21 @@ void selectAuton(){
   }
   return;
 }
+void closeClamp(){
+  Clamp.set(true);
+}
+
+void openClamp(){
+  Clamp.set(false);
+}
+
+void toggleClamp(){
+  Clamp.set(!Clamp.value());
+}
+
+void doinker(){
+  Doinker.set(!Doinker.value());
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -107,6 +123,7 @@ void selectAuton(){
 void pre_auton(void) {
 Brain.Screen.printAt(1,20,"Pre Auto is running  >:)");
 drawGUI();
+wait(2000,msec); 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -132,17 +149,19 @@ void driveBrake(){
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
+//inchdrive with heading correction cuz im goated that way
 void inchDrive(float target){
   LeftBack.setPosition(0,rev);
   float x=LeftBack.position(rev)*pi*D*G;
   float error=target;
   float accuracy=0.5;
-  float kp=5.5;
+  float kp=4.0;
   float speed=kp*error;
   float heading=0.0;
   Gyro.resetHeading();
+  Gyro.setRotation(0.0,degrees);
   float gyro=Gyro.rotation(degrees);
-  float correction=heading-gyro;
+  float correction=(heading-gyro)*0.75;
   while(fabs(error)>accuracy){
     float x=LeftBack.position(rev)*pi*D*G;
     error=target-x;
@@ -176,6 +195,33 @@ void gyroTurn(float target){
   driveBrake();
   wait(250,msec);
 }
+
+void arcTurn(float R, float angle){
+  float targetL=pi*D*angle*(r+R)/360;
+  float s=LeftMiddle.position(rev)*pi*D*G;
+  float errorL=targetL-s;
+  float kp=4.0;
+  float accuracy=0.5;
+  float lspeed=kp*errorL;
+  float rspeed=lspeed/(r+R)/R;
+  while(fabs(errorL)>accuracy){
+    if(lspeed>100) lspeed=100;
+    if (lspeed<-100) lspeed=-100;
+    drive(lspeed,rspeed,10);
+    float s=LeftMiddle.position(rev)*pi*D*G;
+    errorL=targetL-s;
+    float rspeed=kp*errorL;
+    float lspeed=rspeed*(r+R)/R;
+  }
+  driveBrake();
+}
+//   {}    ___       {}
+//---[]---/ []    ---[]---  
+//   /\              /\                                                                                                                                                                                               \
+//  /  \            /  \                                                                                                                                                                                              \
+//
+//
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -192,7 +238,8 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      gyroTurn(90);
+      arcTurn(24,90);
+      inchDrive(12);
       break;
       case 1:
       //code 1
@@ -221,8 +268,12 @@ void autonomous(void) {
 void usercontrol(void) {
   Brain.Screen.printAt(1,60,"User is running ");
   // User control code here, inside the loop
-  while (1) {
-    wait(20, msec);
+  while (true) {
+    float lstick=Controller1.Axis3.position();
+    float sstick=Controller1.Axis1.position();
+
+    drive(lstick+sstick,lstick-sstick,10);
+
   }
 }
 
@@ -242,3 +293,4 @@ Brain.Screen.pressed(selectAuton);
     wait(100, msec);
   }
 }
+//  

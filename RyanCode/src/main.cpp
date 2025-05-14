@@ -23,6 +23,9 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
+<<<<<<<< HEAD:RyanCode/src/main.cpp
+
+
 // motor RightTop = motor(PORT7, ratio6_1, false);
 // motor RightMiddle = motor(PORT5, ratio6_1, true);
 // motor RightBack = motor(PORT6, ratio6_1, true);
@@ -30,28 +33,34 @@ motor WallStake = motor(PORT12, ratio18_1, false);
 // motor LeftMiddle = motor(PORT9, ratio6_1, false);
 // motor LeftBack = motor(PORT8, ratio6_1, false);
 
+========
+>>>>>>>> 2642cabc747da71a689b95ff3a7c20224b8ea619:RyanC++/src/main.cpp
 motor RightTop = motor(PORT7, ratio6_1, true);
 motor RightMiddle = motor(PORT5, ratio6_1, false);
 motor RightBack = motor(PORT6, ratio6_1, false);
 motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
-
+<<<<<<<< HEAD:RyanCode/src/main.cpp
 motor LeftBack = motor(PORT8, ratio6_1, true);
 
 
-
+========
+motor LeftBack = motor(PORT8, ratio6_1,true);
+>>>>>>>> 2642cabc747da71a689b95ff3a7c20224b8ea619:RyanC++/src/main.cpp
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 digital_out Pistion2 = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
-
+<<<<<<<< HEAD:RyanCode/src/main.cpp
 
 // inertial Gyro = inertial(PORT20);
 
 inertial Gyro = inertial(PORT20);
 
 
-
+========
+inertial Gyro = inertial(PORT20);
+>>>>>>>> 2642cabc747da71a689b95ff3a7c20224b8ea619:RyanC++/src/main.cpp
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -142,7 +151,7 @@ void gyroTurn(float target){
   error=target-heading;
   speed=kp*error;
  }
-
+<<<<<<<< HEAD:RyanCode/src/main.cpp
 
 void closeClamp(){
   Clamp.set(true);
@@ -153,9 +162,9 @@ void openClamp(){
 }
 void toggleClamp(){
   Clamp.set(!Clamp.value());
-
+========
  driveBrake();
-
+>>>>>>>> 2642cabc747da71a689b95ff3a7c20224b8ea619:RyanC++/src/main.cpp
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -193,13 +202,19 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-
+<<<<<<<< HEAD:RyanCode/src/main.cpp
       inchDrive(66);
       closeClamp();
       wait(1000, msec);
       gyroTurn(-45);
       inchDrive(40);
-
+========
+      inchDrive(6);
+      gyroTurn(90);
+      inchDrive(12);
+      gyroTurn(90);
+      inchDrive(12);
+>>>>>>>> 2642cabc747da71a689b95ff3a7c20224b8ea619:RyanC++/src/main.cpp
       break;
       case 1:
       //code 1
