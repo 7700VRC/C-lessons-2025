@@ -33,12 +33,12 @@ motor WallStake = motor(PORT12, ratio18_1, false);
 // motor LeftBack = motor(PORT8, ratio6_1, false);
 
 
-motor RightTop = motor(PORT5, ratio6_1, false);
-motor RightMiddle = motor(PORT8, ratio6_1, false);
-motor RightBack = motor(PORT16, ratio6_1, false);
-motor LeftTop = motor(PORT15, ratio6_1, true);
-motor LeftMiddle = motor(PORT18, ratio6_1, true);
-motor LeftBack = motor(PORT19, ratio6_1, true);
+motor RightTop = motor(PORT7, ratio6_1, false);
+motor RightMiddle = motor(PORT5, ratio6_1, false);
+motor RightBack = motor(PORT6, ratio6_1, false);
+motor LeftTop = motor(PORT10, ratio6_1, true);
+motor LeftMiddle = motor(PORT9, ratio6_1, true);
+motor LeftBack = motor(PORT8, ratio6_1, true);
 
 
 //Pneumatics
@@ -108,9 +108,6 @@ void selectAuton(){
 }
 
 void drive(int lspeed, int rspeed, int wt){
-  LeftBack.spin(forward,lspeed,pct);
-  LeftMiddle.spin(forward,lspeed,pct);
-  LeftTop.spin(forward,lspeed,pct);
 
   RightBack.spin(forward,rspeed,pct);
   RightMiddle.spin(forward,rspeed,pct);
@@ -144,6 +141,28 @@ void inchDrive(float target){
   x=LeftBack.position(rev)*Pi*D*G;
   error=target-x;
  }
+driveBrake();
+}
+
+float r=12.0
+void arcDrive(float R, float angle) {
+float TargetR = 2*Pi*(R+r)*angle/360;
+float errorR = TargetR;
+float kp = 1.0
+float accuarcy = 0.5;
+float s=0;
+float rspeed;
+float lspeed;
+while(fabs(errorL)>accuracy) {
+  rspeed=kp*errorR;
+  if(rspeed>100) rspeed=100;
+  if(rspeed<-100) rspeed=-100;
+  lspeed=rspeed*R/(R+r);
+  drive(lspeed,rspeed,10);
+  s=LeftMiddle.position(rev)*Pi*D*G
+  errorL = TargetL-s;
+  std::cout;
+}
 driveBrake();
 }
 
@@ -197,22 +216,13 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      Brain.Screen.drawCircle(200,200,25);
-      inchDrive(12);
-      gyroTurn(90);
-      wait(20, msec);
-      inchDrive(12);
-      gyroTurn(-90);
-      inchDrive(12);
-      gyroTurn(90);
-      inchDrive(12);
-      gyroTurn(-90);
+      wait(500,msec);
+      arcDrive(24,90);
 
       break;
       case 1:
       //code 1
       Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
       drive(50,50,2000);
       driveBrake();
       break;
@@ -220,7 +230,6 @@ void autonomous(void) {
       //code 2
       Brain.Screen.clearScreen();
       Brain.Screen.setFillColor(blue);
-      Brain.Screen.drawRectangle(1,20,200,200);
       break;
 }
 }
