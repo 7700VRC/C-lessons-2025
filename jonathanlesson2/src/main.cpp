@@ -8,7 +8,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
-
+#include <iostream>
 using namespace vex;
 
 // A global instance of competition
@@ -29,6 +29,14 @@ motor RightBack = motor(PORT6, ratio6_1, false);
 motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
+
+
+
+
+
+
+
+
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
@@ -62,6 +70,11 @@ float pi=3.1415926535897932384626433832795028841971693993751058;
 float D=2.75;
 float G=36.0/48.0;
 float r=12.0;
+
+
+//6 7 :)
+
+
 
 int AutonSelected=0;
 int AutonMin=0;
@@ -179,18 +192,29 @@ void inchDrive(float target){
   driveBrake();
   wait(250,msec);
 }
-
+//PIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPID
 void gyroTurn(float target){
   float heading = 0.0;
   float error = target-heading;
   float kp = 0.7;
+  float kd = 0.7;
+  float de = 0;
+  float dt = 10;
+  float perror=0;
   float speed = kp*error;
   float accuracy = 0.5;
+  float mpower = 0.05;
   while(fabs(error)>accuracy){
     drive(speed,-speed,10);
     heading = Gyro.rotation(degrees);
     error = target-heading;
-    speed=kp*error;
+    de=error-perror;
+    speed=kp*error+kd*(de/dt);
+    if (fabs(speed)<mpower){
+      speed=mpower *speed/fabs(speed);
+    }
+    perror=error;
+
   }
   driveBrake();
   wait(250,msec);
@@ -215,11 +239,12 @@ void arcTurn(float R, float angle){
   }
   driveBrake();
 }
-//   {}    ___       {}
-//---[]---/ []    ---[]---  
-//   /\              /\                                                                                                                                                                                               \
-//  /  \            /  \                                                                                                                                                                                              \
-//
+//   {}    ___        {}
+//---[]---/ []     ---[]---  
+//   /\               /\                                                                                                                                                                                                                                                                                                                                                        \
+//  /  \             /  \                                                                                                                                                                                                                                                                                                                                                       \
+//    
+//      pew pew noises
 //
 
 /*---------------------------------------------------------------------------*/
@@ -237,16 +262,17 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      Brain.Screen.drawCircle(200,200,25);
-      arcTurn(24,90);
-      inchDrive(12);
+      std::cout<<"GyroTurn Running"<<std::endl;
+      for(int count=0; count<4; count=count+1){
+        gyroTurn(90);
+      }
       break;
-      case 1:
+    case 1:
       //code 1
       Brain.Screen.clearScreen();
       Brain.Screen.drawLine(1,20,200,200);
       break;
-      case 2:
+    case 2:
       //code 2
       Brain.Screen.clearScreen();
       Brain.Screen.setFillColor(blue);
@@ -279,7 +305,7 @@ void usercontrol(void) {
 
 //
 // Main will set up the competition functions and callbacks.
-//
+
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
@@ -293,4 +319,3 @@ Brain.Screen.pressed(selectAuton);
     wait(100, msec);
   }
 }
-//  
