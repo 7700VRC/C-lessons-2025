@@ -154,14 +154,30 @@ void gyroTurn(float target){
  float heading=0.0;
  float error= target-heading;
  float kp=0.7;
+ float kd=0.7;
+ float de = 0;
+ float dt = 10 / 1000; // 10 ms per loop in seconds
+ float previous_error = 0;
  float speed=kp*error;
  float accuracy=0.5;
+ float minimum_power = 0.05;
+
  Gyro.setRotation(0.0,degrees);
  while(fabs(error)>accuracy){
   drive(speed,-speed,10);
   heading=Gyro.rotation(degrees);
   error=target-heading;
-  speed=kp*error;
+  de = error = previous_error;
+  speed=kp*error + kd * (de/dt);
+  // 10 ms per loop
+  if (fabs(speed) < minimum_power){
+    speed = minimum_power * speed/fabs(speed);
+
+  }
+
+
+  previous_error = error;
+
  }
  driveBrake();
 }
@@ -211,17 +227,25 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      arcDrive(24,90);
-      wait(500, msec);
-      inchDrive(12);
       break;
-      case 1:
+    case 1:
       //code 1
       Brain.Screen.clearScreen();
       Brain.Screen.drawLine(1,20,200,200);
-      case 2:
+    case 2:
       //code 2
       Brain.Screen.clearScreen();
+    case 3:
+      //code 3: gyroturn 360
+      Brain.Screen.clearScreen();
+      gyroTurn(90);
+      wait(200,msec);
+      gyroTurn(90);
+      wait(200,msec);
+      gyroTurn(90);
+      wait(200,msec);
+      gyroTurn(90);
+      break;
   }
 }
 /*---------------------------------------------------------------------------*/
