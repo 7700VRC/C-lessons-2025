@@ -17,7 +17,7 @@ competition Competition;
 // define your global instances of motors and other devices here
 controller  Controller1;
 brain Brain;
-
+/*
 /// MOTORS and Devices Info for 7899C Robot
 //Scoring/Intake Motors
 motor Intake = motor(PORT11, ratio6_1, false);
@@ -29,6 +29,7 @@ motor RightBack = motor(PORT6, ratio6_1, false);
 motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
+*/
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
@@ -39,15 +40,15 @@ analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
 //END-- MOTORS and Devices Info for 7899C Robot
 //hi
-/*
+
 // MOTORS and Devices Info for 7899A Robot
 //drivebase motors
-motor FrontLeft = motor (PORT14, ratio6_1, true);
-motor FrontRight = motor (PORT8, ratio6_1, false);
-motor MiddleLeft = motor (PORT17, ratio6_1, true);
-motor MiddleRight = motor (PORT7, ratio6_1, false);
-motor BackLeft = motor (PORT20, ratio6_1, true);
-motor BackRight = motor (PORT1, ratio6_1, false);
+motor LeftMiddle = motor (PORT14, ratio6_1, true);
+motor RightMiddle = motor (PORT8, ratio6_1, false);
+motor LeftTop = motor (PORT17, ratio6_1, true);
+motor RightTop = motor (PORT7, ratio6_1, false);
+motor LeftBack = motor (PORT20, ratio6_1, true);
+motor RightBack = motor (PORT1, ratio6_1, false);
 
 //subsystems
 motor skibiditoilet = motor (PORT9, ratio6_1, false);
@@ -55,11 +56,11 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 
 //postons
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
-*/
+
 
 int AutonSelected=0;
 int AutonMin=0;
-int AutonMax=2;
+int AutonMax=3;
 
 void drawGUI(){
 Brain.Screen.clearScreen();
@@ -204,12 +205,12 @@ void toggleClamp(){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-  Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
-  drawGUI();
-  wait(2000, msec);
-  toggleClamp();
-  wait(200, msec);
-  openClamp();
+  // Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
+  // drawGUI();
+  // wait(2000, msec);
+  // toggleClamp();
+  // wait(200, msec);
+  // openClamp();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -224,29 +225,38 @@ void pre_auton(void) {
 
 void autonomous(void) {
   Brain.Screen.printAt(1,40,"My Auto is running ");
-  switch (AutonSelected) {
-    case 0:
-      //code 0
-      break;
-    case 1:
-      //code 1
-      Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
-    case 2:
-      //code 2
-      Brain.Screen.clearScreen();
-    case 3:
-      //code 3: gyroturn 360
-      Brain.Screen.clearScreen();
       gyroTurn(90);
       wait(200,msec);
       gyroTurn(90);
       wait(200,msec);
       gyroTurn(90);
       wait(200,msec);
-      gyroTurn(90);
-      break;
-  }
+      gyroTurn(90); 
+
+  // switch (AutonSelected) {
+  //   case 0:
+  //     //code 0
+  //     gyroTurn(90);
+  //     wait(200,msec);
+  //     gyroTurn(90);
+  //     wait(200,msec);
+  //     gyroTurn(90);
+  //     wait(200,msec);
+  //     gyroTurn(90);
+  //     break;
+  //   case 1:
+  //     //code 1
+  //     Brain.Screen.clearScreen();
+  //     Brain.Screen.drawLine(1,20,200,200);
+  //     break;
+  //   case 2:
+  //     //code 2
+  //     Brain.Screen.clearScreen();
+  //     break;
+  //   case 3:
+  //     //code 3: gyroturn 360
+
+  // }
 }
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
