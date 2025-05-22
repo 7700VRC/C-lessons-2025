@@ -1,14 +1,14 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       georgekirkman                                             */
+/*    Author:       skibidy                                         */
 /*    Created:      3/26/2025, 4:17:27 PM                                     */
 /*    Description:  V5 project                                                */
-/*    Belongs To:   Zach                                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
+
 using namespace vex;
 
 // A global instance of competition
@@ -23,17 +23,17 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT7, ratio6_1, false);//
+motor RightTop = motor(PORT7, ratio6_1, true);
 motor RightMiddle = motor(PORT5, ratio6_1, false);
 motor RightBack = motor(PORT6, ratio6_1, false);
-motor LeftTop = motor(PORT10, ratio6_1, true);
+motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
-digital_out  Clamp = digital_out(Brain.ThreeWirePort.A);
-pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
+digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
+digital_in Doinker = digital_in(Brain.ThreeWirePort.H);
 //Gyro
-inertial Gyro = inertial(PORT2);
+inertial Gyro = inertial(PORT20);
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -95,7 +95,6 @@ void drive(int lspeed, int rspeed, int wt){
   LeftMiddle.spin(forward,lspeed,pct);
   LeftTop.spin(forward,lspeed,pct);
 
-
   RightBack.spin(forward,rspeed,pct);
   RightMiddle.spin(forward,rspeed,pct);
   RightTop.spin(forward,rspeed,pct);
@@ -111,71 +110,51 @@ void driveBrake(){
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
-float Pi=3.14159;
+float Pi=3.14;  
 float D=2.75; //wheel diameter
 float G=36.0/48.0;
-float r=12.0;
 void inchDrive(float target){
-  LeftBack.setPosition(0,rev);
-  float x = 0.0;
-  float error=target;
-  float accuracy=0.5;
-  float kp=4.0;
-  float speed=kp*error;
-  while(fabs(error)>accuracy){
-    drive(speed,speed,10);
-    x=LeftBack.position(rev)*Pi*D*G;
-    error=target-x;
-}
-driveBrake();
-}
-
-//float r =12.0/24.0;
-void arcDrive(float R, float angle){
-
-float TargetL=2*Pi*(R+r)*angle/360;
-float errorL=TargetL;
-float Kp=5.0;
-float acurracy = 0.5;
-float s=0.0;
-float rspeed;
-float lspeed;
-while(fabs(errorL)>acurracy){
-rspeed=Kp*errorL;
-if(rspeed>100) rspeed=100;
-if(rspeed<-100) rspeed=-100;
-rspeed=lspeed*(r+R);
-s=LeftMiddle.position(rev)*Pi*D*G;
-errorL=TargetL-s;
-
-}
+ LeftBack.setPosition(0,rev);
+ float x = 0.0;
+ float error=target;
+ float accuracy=0.5;
+ float kp=4.0;
+ float speed=kp*error;
+ while(fabs(error)>accuracy){
+  drive(speed,speed,10);
+  x=LeftBack.position(rev)*Pi*D*G;
+  error=target-x;
+  speed=kp*error;
+ }
 driveBrake();
 }
 
 void gyroTurn(float target){
-  float heading=0.0;
-  float error= target-heading;
-  float kp=0.7;
-  float speed=kp*error;
-  float accuracy=0.5;
-  Gyro.setRotation(0.0,degrees);
-  while(fabs(error)>accuracy){
-  drive (speed,-speed,10);
+ float heading=0.0;
+ float error= target-heading;
+ float kp=0.7;
+ float speed=kp*error;
+ float accuracy=0.5;
+ Gyro.setRotation(0.0,degrees);
+ while(fabs(error)>accuracy){
+  drive(speed,-speed,10);
   heading=Gyro.rotation(degrees);
   error=target-heading;
   speed=kp*error;
+ }
+ driveBrake();
 }
-driveBrake();
-}
+
 void closeClamp(){
   Clamp.set(true);
 }
 void openClamp(){
   Clamp.set(false);
 }
-
 void toggleClamp(){
-Clamp.set(!Clamp.value());
+  // !false means not false makes it true 
+  Clamp.set(!Clamp.value());
+  //if the clamp is true the ! will set it to false and vice versa
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -190,9 +169,9 @@ Clamp.set(!Clamp.value());
 void pre_auton(void) {
 Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
 drawGUI();
-wait(2000,msec);
+wait(2000, msec);
 toggleClamp();
-wait(200,msec);
+wait(2000, msec);
 openClamp();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -213,29 +192,27 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
+      inchDrive(-98);
+      closeClamp(); 
+      wait(2000,msec);
+      gyroTurn(-45);
+      inchDrive(60); 
+      gyroTurn(90);
+      inchDrive(70);
+      gyroTurn(-45);
 
-      Brain.Screen.drawCircle(200,200,25);
-      inchDrive(-84);
-      wait(1000, msec);
-      closeClamp();
-      wait(1000, msec);
-      gyroTurn(45);
-      inchDrive(-24);
-      wait(1000, msec);
-      openClamp();
+       
+
       break;
       case 1:
       //code 1
       Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
-      drive(50,50,2000);
+      drive(50,50,1000);
       driveBrake();
       break;
       case 2:
       //code 2
       Brain.Screen.clearScreen();
-      Brain.Screen.setFillColor(blue);
-      Brain.Screen.drawRectangle(1,20,200,200);
       break;
 }
 }
@@ -259,7 +236,7 @@ void usercontrol(void) {
 
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to
-    // update your giga chad motors, etc.
+    // update your motors, etc.
     // ........................................................................
 
     wait(20, msec); // Sleep the task for a short amount of time to
@@ -283,14 +260,3 @@ Brain.Screen.pressed(selectAuton);
     wait(100, msec);
   }
 }
-
-/*--------------------------------------------------------------*/
-/*                                                              */
-/*                       Brain rot phase                        */
-/*                                                              */
-/*                                                              */
-/* oia oia oia {the cat is spinning🐈😵‍💫}(The sigma is mewing🤫🧏 */
-/*Zach is hacking???                                            */
-/*                                                              */
-/*--------------------------------------------------------------*/
-//hi
