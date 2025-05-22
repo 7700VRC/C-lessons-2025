@@ -31,14 +31,14 @@ motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
-pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
+digital_in Doinker = digital_in(Brain.ThreeWirePort.H);
 //Gyro
-inertial Gyro = inertial(PORT2);
+inertial Gyro = inertial(PORT20);
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
 //END-- MOTORS and Devices Info for 7899C Robot
-//hi
+
 /*
 // MOTORS and Devices Info for 7899A Robot
 //drivebase motors
@@ -90,8 +90,6 @@ void selectAuton(){
   return;
 }
 
-
-
 void drive(int lspeed, int rspeed, int wt){
   LeftBack.spin(forward,lspeed,pct);
   LeftMiddle.spin(forward,lspeed,pct);
@@ -120,36 +118,17 @@ void inchDrive(float target){
  float x = 0.0;
  float error=target;
  float accuracy=0.5;
- float kp=7.0;
+ float kp=4.0;
  float speed=kp*error;
  while(fabs(error)>accuracy){
   drive(speed,speed,10);
   x=LeftBack.position(rev)*Pi*D*G;
   error=target-x;
+  speed=kp*error;
  }
 driveBrake();
 }
 
-float r=12.0;
-void arcDrive(float R, float angle){
-  float TargetL= 2*Pi*(R+r)*angle/360;
-  float errorL=TargetL;
-  float kp=2.0;
-  float accuracy = 0.5;
-  float s=0.0;
-  float rspeed;
-  float lspeed;
-  while(fabs(errorL)>accuracy){
-    lspeed=kp*errorL;
-    if(lspeed>100) lspeed=100;
-    if(lspeed<100) lspeed=-100;
-    rspeed=lspeed*R/(R+r);
-    drive(lspeed, rspeed, 10);
-    s=LeftMiddle.position(rev)*Pi*D*G;
-    errorL=TargetL-s;
-  }
-  driveBrake();
-}
 void gyroTurn(float target){
  float heading=0.0;
  float error= target-heading;
@@ -172,11 +151,11 @@ void closeClamp(){
 void openClamp(){
   Clamp.set(false);
 }
-
 void toggleClamp(){
+  // !false means not false makes it true 
   Clamp.set(!Clamp.value());
+  //if the clamp is true the ! will set it to false and vice versa
 }
-
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -188,12 +167,14 @@ void toggleClamp(){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-  Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
-  drawGUI();
-  wait(2000, msec);
-  toggleClamp();
-  wait(200, msec);
-  openClamp();
+Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
+drawGUI();
+wait(2000, msec);
+toggleClamp();
+wait(2000, msec);
+openClamp();
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
 }
 
 /*---------------------------------------------------------------------------*/
@@ -211,49 +192,30 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      inchDrive(36);
-      gyroTurn(-90);
-      //intake starts
-      inchDrive(8);
-      gyroTurn(90);
-      inchDrive(4);
-      //intake stops
-      inchDrive(-4);
-      gyroTurn(45);
-      inchDrive(12);
-      gyroTurn(180);
-      inchDrive(4);
-      //Intake starts
-      wait(500, msec);
-      //Intake stops
-      gyroTurn(180);
-      inchDrive(-16);
-      gyroTurn(45);
-      //intake starts
-      inchDrive(48);
-      gyroTurn(-90);
-      inchDrive(4);
-      //intake stops
-      inchDrive(-4);
+      inchDrive(-98);
+      closeClamp(); 
+      wait(2000,msec);
       gyroTurn(-45);
-      inchDrive(12);
-      gyroTurn(180);
-      inchDrive(4);
-      //intake start
-      wait(500, msec);
-      //intake stop
+      inchDrive(60); 
+      gyroTurn(90);
+      inchDrive(70);
+      gyroTurn(-45);
+
+       
 
       break;
       case 1:
       //code 1
       Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
+      drive(50,50,1000);
+      driveBrake();
+      break;
       case 2:
       //code 2
       Brain.Screen.clearScreen();
-  }
+      break;
 }
-//hi
+}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -282,12 +244,14 @@ void usercontrol(void) {
   }
 }
 
+//
 // Main will set up the competition functions and callbacks.
+//
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-  Brain.Screen.pressed(selectAuton);
+Brain.Screen.pressed(selectAuton);
   // Run the pre-autonomous function.
   pre_auton();
 
@@ -296,5 +260,3 @@ int main() {
     wait(100, msec);
   }
 }
-//iicbtbhowytomicdaaicelhtlwistwylwhliticdaaicelhtllylyiatimbbbistitcitysgbinlylaygijayiwtikwmytiss
-//dynhigqwtneamyaasdydlamtwidnrohydftsotbpltyhasnssspbbbohiwywuodrtmcylaljlmstwittyocwrtasaatmhaislalbtyfitcilyfts - wagtdlimbsittbutlidmabihtgtomcityttwittyocwrtasaatmhaislalbdyfitcilyfts - cilyjtoyikilyfts
