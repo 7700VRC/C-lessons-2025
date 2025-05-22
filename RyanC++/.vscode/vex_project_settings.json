@@ -4,12 +4,16 @@
 		"json": 2
 	},
 	"project": {
-		"name": "DKlesson1",
+		"name": "RyanCode",
 		"description": "",
 		"creationDate": "3/26/2025, 4:17:27 PM",
 		"platform": "V5",
 		"language": "cpp",
+<<<<<<<< HEAD:RyanCode/.vscode/vex_project_settings.json
+		"slot": 7,
+========
 		"slot": 1,
+>>>>>>>> 2642cabc747da71a689b95ff3a7c20224b8ea619:RyanC++/.vscode/vex_project_settings.json
 		"sdkVersion": "V5_20240802_15_00_00",
 		"cpp": {
 			"includePath": [],

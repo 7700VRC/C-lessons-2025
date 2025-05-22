@@ -1,14 +1,14 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       jonathan xu                                               */
-/*    Created:      4/2/2025, 4:??:?? PM                                      */
+/*    Author:       georgekirkman                                             */
+/*    Created:      3/26/2025, 4:17:27 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
 #include "vex.h"
-#include <iostream>
+
 using namespace vex;
 
 // A global instance of competition
@@ -23,25 +23,34 @@ brain Brain;
 motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-motor RightTop = motor(PORT7, ratio6_1, true);
+
+
+// motor RightTop = motor(PORT7, ratio6_1, false);
+// motor RightMiddle = motor(PORT5, ratio6_1, true);
+// motor RightBack = motor(PORT6, ratio6_1, true);
+// motor LeftTop = motor(PORT10, ratio6_1, true);
+// motor LeftMiddle = motor(PORT9, ratio6_1, false);
+// motor LeftBack = motor(PORT8, ratio6_1, false);
+
+
+motor RightTop = motor(PORT7, ratio6_1, false);
 motor RightMiddle = motor(PORT5, ratio6_1, false);
 motor RightBack = motor(PORT6, ratio6_1, false);
-motor LeftTop = motor(PORT10, ratio6_1, false);
+motor LeftTop = motor(PORT10, ratio6_1, true);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
 
 
-
-
-
-
-
-
 //Pneumatics
-digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
-digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
+pneumatics Clamp = pneumatics(Brain.ThreeWirePort.A);
+pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
 //Gyro
-inertial Gyro = inertial(PORT20);
+
+// inertial Gyro = inertial(PORT20);
+
+inertial Gyro = inertial(PORT2);
+
+
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
@@ -64,17 +73,6 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 //postons
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
 */
-//random numbers
-
-float pi=3.1415926535897932384626433832795028841971693993751058;
-float D=2.75;
-float G=36.0/48.0;
-float r=12.0;
-
-
-//6 7 :)
-
-
 
 int AutonSelected=0;
 int AutonMin=0;
@@ -108,21 +106,95 @@ void selectAuton(){
   }
   return;
 }
-void closeClamp(){
-  Clamp.set(true);
+
+void drive(int lspeed, int rspeed, int wt){
+
+  RightBack.spin(forward,rspeed,pct);
+  RightMiddle.spin(forward,rspeed,pct);
+  RightTop.spin(forward,rspeed,pct);
+
+  wait(wt,msec);
 }
 
-void openClamp(){
-  Clamp.set(false);
+void driveBrake(){
+  LeftBack.stop(brake);
+  LeftMiddle.stop(brake);
+  LeftTop.stop(brake);
+  RightBack.stop(brake);
+  RightMiddle.stop(brake);
+  RightTop.stop(brake);
+}
+float Pi=3.14;
+float D=2.75; //wheel diameter
+float G=36.0/48.0;
+
+
+void inchDrive(float target){
+ LeftBack.setPosition(0,rev);
+ float x = 0.0;
+ float error=target;
+ float accuracy=0.5;
+ float kp=2.0;
+ float speed=kp*error;
+ while(fabs(error)>accuracy){
+  drive(speed,speed,10);
+  x=LeftBack.position(rev)*Pi*D*G;
+  error=target-x;
+ }
+driveBrake();
 }
 
-void toggleClamp(){
-  Clamp.set(!Clamp.value());
-}
+// float r=12.0
+// void arcDrive(float R, float angle) {
+// float TargetR = 2*Pi*(R+r)*angle/360;
+// float errorR = TargetR;
+// float kp = 1.0
+// float accuracy = 0.5;
+// float s=0;
+// float rspeed;
+// float lspeed;
+// while(fabs(errorL)>accuracy) {
+//   rspeed=kp*errorR;
+//   if(rspeed>100) rspeed=100;
+//   if(rspeed<-100) rspeed=-100;
+//   lspeed=rspeed*R/(R+r);
+//   drive(lspeed,rspeed,10);
+//   s=LeftMiddle.position(rev)*Pi*D*G
+//   errorL = TargetL-s;
+//   // std::cout<<std::endl;
+// }
+// driveBrake();
+// }
 
-void doinker(){
-  Doinker.set(!Doinker.value());
-}
+
+void gyroTurn(float target){
+ float heading=0.0;
+ float error=target-heading;
+ float kp =0.7;
+ float kd =0.7;
+ float dt = 10 / 1000;
+ float previous_error = 0;
+ float speed = kp*error;
+ float accuracy=0.5;
+ float minimum_power = 0.05;
+ float de = 0.1;
+ Gyro.setRotation(0.0, degrees);
+ while(fabs(error)>accuracy){
+    drive(speed, -speed, 10);
+    heading=Gyro.rotation(degrees);
+    error=target-heading;
+    de = error - previous_error;
+    speed=kp*error + kd * (de/dt);
+    if(fabs(speed) < minimum_power) {
+      speed = minimum_power * speed/fabs(speed);
+    } 
+
+    previous_error = error;
+  }
+driveBrake();
+ }
+
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -134,118 +206,11 @@ void doinker(){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-Brain.Screen.printAt(1,20,"Pre Auto is running  >:)");
+Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
 drawGUI();
-wait(2000,msec); 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
-
-
-void drive(int lspeed, int rspeed, int wt){
- //left motors
-  LeftBack.spin(fwd,lspeed,pct);
-  LeftMiddle.spin(fwd,lspeed,pct);
-  LeftTop.spin(fwd,lspeed,pct);
- //right motors
-  RightBack.spin(fwd,rspeed,pct);
-  RightMiddle.spin(fwd,rspeed,pct);
-  RightTop.spin(fwd,rspeed,pct);
-  //wait
-  wait(wt,msec);
-}
-void driveBrake(){
-  LeftBack.stop(brake);
-  LeftMiddle.stop(brake);
-  LeftTop.stop(brake);
-  RightBack.stop(brake);
-  RightMiddle.stop(brake);
-  RightTop.stop(brake);
-}
-//inchdrive with heading correction cuz im goated that way
-void inchDrive(float target){
-  LeftBack.setPosition(0,rev);
-  float x=LeftBack.position(rev)*pi*D*G;
-  float error=target;
-  float accuracy=0.5;
-  float kp=4.0;
-  float speed=kp*error;
-  float heading=0.0;
-  Gyro.resetHeading();
-  Gyro.setRotation(0.0,degrees);
-  float gyro=Gyro.rotation(degrees);
-  float correction=(heading-gyro)*0.75;
-  while(fabs(error)>accuracy){
-    float x=LeftBack.position(rev)*pi*D*G;
-    error=target-x;
-    speed=kp*error;
-    if(speed>100){
-      speed=100;
-    }
-    if(speed<-100){
-      speed=-100;
-    }
-    float gyro=Gyro.rotation(degrees);
-    float correction=heading-gyro;
-    drive(speed+correction,speed-correction,10);
-  }
-  driveBrake();
-  wait(250,msec);
-}
-//PIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPIDPID
-void gyroTurn(float target){
-  float heading = 0.0;
-  float error = target-heading;
-  float kp = 0.7;
-  float kd = 0.7;
-  float de = 0;
-  float dt = 10;
-  float perror=0;
-  float speed = kp*error;
-  float accuracy = 0.5;
-  float mpower = 0.05;
-  while(fabs(error)>accuracy){
-    drive(speed,-speed,10);
-    heading = Gyro.rotation(degrees);
-    error = target-heading;
-    de=error-perror;
-    speed=kp*error+kd*(de/dt);
-    if (fabs(speed)<mpower){
-      speed=mpower *speed/fabs(speed);
-    }
-    perror=error;
-
-  }
-  driveBrake();
-  wait(250,msec);
-}
-
-void arcTurn(float R, float angle){
-  float targetL=pi*D*angle*(r+R)/360;
-  float s=LeftMiddle.position(rev)*pi*D*G;
-  float errorL=targetL-s;
-  float kp=4.0;
-  float accuracy=0.5;
-  float lspeed=kp*errorL;
-  float rspeed=lspeed/(r+R)/R;
-  while(fabs(errorL)>accuracy){
-    if(lspeed>100) lspeed=100;
-    if (lspeed<-100) lspeed=-100;
-    drive(lspeed,rspeed,10);
-    float s=LeftMiddle.position(rev)*pi*D*G;
-    errorL=targetL-s;
-    float rspeed=kp*errorL;
-    float lspeed=rspeed*(r+R)/R;
-  }
-  driveBrake();
-}
-//   {}    ___        {}
-//---[]---/ []     ---[]---  
-//   /\               /\                                                                                                                                                                                                                                                                                                                                                        \
-//  /  \             /  \                                                                                                                                                                                                                                                                                                                                                       \
-//    
-//      pew pew noises
-//
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -262,25 +227,28 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      std::cout<<"GyroTurn Running"<<std::endl;
-      for(int count=0; count<4; count=count+1){
-        gyroTurn(90);
-      }
+      wait(500,msec);
+      gyroTurn(90);
+      gyroTurn(90);
+      gyroTurn(90);
+      gyroTurn(90);
+
+      
+
       break;
-    case 1:
+      case 1:
       //code 1
       Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
+      drive(50,50,2000);
+      driveBrake();
       break;
-    case 2:
+      case 2:
       //code 2
       Brain.Screen.clearScreen();
       Brain.Screen.setFillColor(blue);
-      Brain.Screen.drawRectangle(1,20,200,200);
       break;
 }
 }
-
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */
@@ -294,18 +262,24 @@ void autonomous(void) {
 void usercontrol(void) {
   Brain.Screen.printAt(1,60,"User is running ");
   // User control code here, inside the loop
-  while (true) {
-    float lstick=Controller1.Axis3.position();
-    float sstick=Controller1.Axis1.position();
+  while (1) {
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
 
-    drive(lstick+sstick,lstick-sstick,10);
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
 
+    wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
   }
 }
 
 //
 // Main will set up the competition functions and callbacks.
-
+//
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
