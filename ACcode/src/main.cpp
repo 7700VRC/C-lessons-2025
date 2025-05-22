@@ -211,9 +211,38 @@ void autonomous(void) {
   switch (AutonSelected) {
     case 0:
       //code 0
-      arcDrive(24,90);
-      wait(500, msec);
+      inchDrive(36);
+      gyroTurn(-90);
+      //intake starts
+      inchDrive(8);
+      gyroTurn(90);
+      inchDrive(4);
+      //intake stops
+      inchDrive(-4);
+      gyroTurn(45);
       inchDrive(12);
+      gyroTurn(180);
+      inchDrive(4);
+      //Intake starts
+      wait(500, msec);
+      //Intake stops
+      gyroTurn(180);
+      inchDrive(-16);
+      gyroTurn(45);
+      //intake starts
+      inchDrive(48);
+      gyroTurn(-90);
+      inchDrive(4);
+      //intake stops
+      inchDrive(-4);
+      gyroTurn(-45);
+      inchDrive(12);
+      gyroTurn(180);
+      inchDrive(4);
+      //intake start
+      wait(500, msec);
+      //intake stop
+
       break;
       case 1:
       //code 1
