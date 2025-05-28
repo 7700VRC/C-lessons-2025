@@ -261,16 +261,39 @@ void autonomous(void) {
   Brain.Screen.printAt(1,40,"My Auto is running ");
   switch (AutonSelected) {
     case 0:
-      //code 0
-      std::cout<<"GyroTurn Running"<<std::endl;
-      for(int count=0; count<4; count=count+1){
-        gyroTurn(90);
-      }
+      inchDrive(60);
+      gyroTurn(-90);
+      inchDrive(12);
+      inchDrive(-48);
+      inchDrive(24);
+      gyroTurn(-135);
+      inchDrive(34);
+      gyroTurn(180);
+      inchDrive(-34);
+      inchDrive(50);
+      gyroTurn(135);
+      inchDrive(24);
       break;
     case 1:
       //code 1
-      Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
+      inchDrive(60);
+      gyroTurn(-90);
+      inchDrive(12);
+      inchDrive(-48);
+      inchDrive(24);
+      gyroTurn(-135);
+      inchDrive(34);
+      gyroTurn(180);
+      inchDrive(-34);
+      inchDrive(16);
+      gyroTurn(-135);
+      inchDrive(48);
+      gyroTurn(45);
+      inchDrive(16); 
+      inchDrive(50);
+      gyroTurn(45);
+      inchDrive(24);
+      inchDrive(-48);
       break;
     case 2:
       //code 2
