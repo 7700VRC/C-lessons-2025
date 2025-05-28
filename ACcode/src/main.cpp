@@ -225,6 +225,7 @@ void pre_auton(void) {
 
 void autonomous(void) {
   Brain.Screen.printAt(1,40,"My Auto is running ");
+<<<<<<< HEAD
       gyroTurn(90);
       wait(200,msec);
       gyroTurn(90);
@@ -257,7 +258,54 @@ void autonomous(void) {
   //     //code 3: gyroturn 360
 
   // }
+=======
+  switch (AutonSelected) {
+    case 0:
+      //code 0
+      inchDrive(36);
+      gyroTurn(-90);
+      //intake starts
+      inchDrive(8);
+      gyroTurn(90);
+      inchDrive(4);
+      //intake stops
+      inchDrive(-4);
+      gyroTurn(45);
+      inchDrive(12);
+      gyroTurn(180);
+      inchDrive(4);
+      //Intake starts
+      wait(500, msec);
+      //Intake stops
+      gyroTurn(180);
+      inchDrive(-16);
+      gyroTurn(45);
+      //intake starts
+      inchDrive(48);
+      gyroTurn(-90);
+      inchDrive(4);
+      //intake stops
+      inchDrive(-4);
+      gyroTurn(-45);
+      inchDrive(12);
+      gyroTurn(180);
+      inchDrive(4);
+      //intake start
+      wait(500, msec);
+      //intake stop
+
+      break;
+      case 1:
+      //code 1
+      Brain.Screen.clearScreen();
+      Brain.Screen.drawLine(1,20,200,200);
+      case 2:
+      //code 2
+      Brain.Screen.clearScreen();
+  }
+>>>>>>> 0104f7179eb1f78f4f819a36fc70f32252bfea88
 }
+//hi
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */

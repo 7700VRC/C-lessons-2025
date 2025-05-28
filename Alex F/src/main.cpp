@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       georgekirkman                                             */
+/*    Author:       skibidy                                         */
 /*    Created:      3/26/2025, 4:17:27 PM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
@@ -20,73 +20,43 @@ brain Brain;
 
 /// MOTORS and Devices Info for 7899C Robot
 //Scoring/Intake Motors
-//motor Intake = motor(PORT11, ratio6_1, false);
+motor Intake = motor(PORT11, ratio6_1, false);
 motor WallStake = motor(PORT12, ratio18_1, false);
 //Drive Motors
-<<<<<<< Updated upstream
-// motor RightTop = motor(PORT7, ratio6_1, false);
-// motor RightMiddle = motor(PORT5, ratio6_1, true);
-// motor RightBack = motor(PORT6, ratio6_1, true);
-// motor LeftTop = motor(PORT10, ratio6_1, true);
-// motor LeftMiddle = motor(PORT9, ratio6_1, false);
-// motor LeftBack = motor(PORT8, ratio6_1, false);
-
 motor RightTop = motor(PORT7, ratio6_1, true);
 motor RightMiddle = motor(PORT5, ratio6_1, false);
 motor RightBack = motor(PORT6, ratio6_1, false);
 motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
-
 motor LeftBack = motor(PORT8, ratio6_1, true);
-
-
-
-=======
-// C robot
-// motor RightTop = motor(PORT7, ratio6_1, true);
-// motor RightMiddle = motor(PORT5, ratio6_1, false);
-// motor RightBack = motor(PORT6, ratio6_1, false);
-// motor LeftTop = motor(PORT10, ratio6_1, false);
-// motor LeftMiddle = motor(PORT9, ratio6_1, true);
-// motor LeftBack = motor(PORT8, ratio6_1,true);
->>>>>>> Stashed changes
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
-digital_out Pistion2 = pneumatics(Brain.ThreeWirePort.H);
+digital_in Doinker = digital_in(Brain.ThreeWirePort.H);
 //Gyro
-
-
-// inertial Gyro = inertial(PORT20);
-
 inertial Gyro = inertial(PORT20);
-
-
-
 //Potentiometer
-analog_in LBpot = analog_in(Brain.ThreeWirePort.B);//
+analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
-<<<<<<< Updated upstream
-=======
 //END-- MOTORS and Devices Info for 7899C Robot
 
-
+/*
 // MOTORS and Devices Info for 7899A Robot
 //drivebase motors
-// A robot
-motor LeftTop = motor (PORT14, ratio6_1, true);
-motor RightTop = motor (PORT8, ratio6_1, false);
-motor LeftMiddle = motor (PORT17, ratio6_1, true);
-motor RightMiddle = motor (PORT7, ratio6_1, false);
-motor LeftBack = motor (PORT20, ratio6_1, true);
-motor RightBack = motor (PORT1, ratio6_1, false);
+motor FrontLeft = motor (PORT14, ratio6_1, true);
+motor FrontRight = motor (PORT8, ratio6_1, false);
+motor MiddleLeft = motor (PORT17, ratio6_1, true);
+motor MiddleRight = motor (PORT7, ratio6_1, false);
+motor BackLeft = motor (PORT20, ratio6_1, true);
+motor BackRight = motor (PORT1, ratio6_1, false);
 
 //subsystems
+motor skibiditoilet = motor (PORT9, ratio6_1, false);
+motor ladyblack = motor (PORT4, ratio36_1, true);
 
 //postons
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
+*/
 
-
->>>>>>> Stashed changes
 int AutonSelected=0;
 int AutonMin=0;
 int AutonMax=2;
@@ -140,78 +110,51 @@ void driveBrake(){
   RightMiddle.stop(brake);
   RightTop.stop(brake);
 }
-<<<<<<< Updated upstream
-float Pi=3.14;
+float Pi=3.14;  
 float D=2.75; //wheel diameter
 float G=36.0/48.0;
-=======
-float Pi = 3.14;
-float D = 2.75; //wheel diameter
-float G = 36.0/48.0;
->>>>>>> Stashed changes
-
 void inchDrive(float target){
-  Brain.Screen.clearScreen();
  LeftBack.setPosition(0,rev);
  float x = 0.0;
- float error = target;
- float accuracy = 0.5;
- float kp = 5.0;
+ float error=target;
+ float accuracy=0.5;
+ float kp=4.0;
  float speed=kp*error;
  while(fabs(error)>accuracy){
   drive(speed,speed,10);
-<<<<<<< Updated upstream
   x=LeftBack.position(rev)*Pi*D*G;
   error=target-x;
-  Brain.Screen.printAt(1,150, "X =  %.2f  ",x);
-=======
-  x = LeftBack.position(rev)*Pi*D*G;
-  error = target-x;
->>>>>>> Stashed changes
+  speed=kp*error;
  }
 driveBrake();
 }
 
 void gyroTurn(float target){
- float heading = 0.0;
- float error = target-heading;
- float kd = 5.0;
- float kp = 5.0;
- float de = 0;
- float dt = 10 / 1000;
- float previous_error = 0;
- float speed = kp*error;
- float accuracy = 0.5;
- float minimum_power = 0.05;
-
+ float heading=0.0;
+ float error= target-heading;
+ float kp=0.7;
+ float speed=kp*error;
+ float accuracy=0.5;
  Gyro.setRotation(0.0,degrees);
  while(fabs(error)>accuracy){
   drive(speed,-speed,10);
-  heading = Gyro.rotation(degrees);
-  error = target-heading;
-  de = error - previous_error;
-  speed = kp*error + kd * (de/dt);
-
-
-  if (fabs(speed) < minimum_power){
-    speed = minimum_power * speed/fabs(speed);
-  }
-  previous_error = error;
+  heading=Gyro.rotation(degrees);
+  error=target-heading;
+  speed=kp*error;
  }
-
+ driveBrake();
+}
 
 void closeClamp(){
   Clamp.set(true);
 }
-
 void openClamp(){
   Clamp.set(false);
 }
 void toggleClamp(){
+  // !false means not false makes it true 
   Clamp.set(!Clamp.value());
-
- driveBrake();
-
+  //if the clamp is true the ! will set it to false and vice versa
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -224,15 +167,16 @@ void toggleClamp(){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-Brain.Screen.printAt(1,20,"Pre Auto is running");
+Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
 drawGUI();
-wait(2000,msec);
+wait(2000, msec);
 toggleClamp();
-wait(200, msec);
+wait(2000, msec);
 openClamp();
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -244,59 +188,32 @@ openClamp();
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  Brain.Screen.printAt(1,40,"Auto is running ");
+  Brain.Screen.printAt(1,40,"My Auto is running ");
   switch (AutonSelected) {
     case 0:
       //code 0
-      Brain.Screen.drawCircle(200,200,25);
-<<<<<<< Updated upstream
-
-      inchDrive(66);
-      closeClamp();
-      wait(1000, msec);
+      inchDrive(-98);
+      closeClamp(); 
+      wait(2000,msec);
       gyroTurn(-45);
-      inchDrive(40);
+      inchDrive(60); 
+      gyroTurn(90);
+      inchDrive(70);
+      gyroTurn(-45);
+
+       
 
       break;
       case 1:
       //code 1
       Brain.Screen.clearScreen();
-      Brain.Screen.drawLine(1,20,200,200);
+      drive(50,50,1000);
       driveBrake();
       break;
       case 2:
       //code 2
       Brain.Screen.clearScreen();
-      Brain.Screen.setFillColor(blue);
-      Brain.Screen.drawRectangle(1,20,200,200);
-=======
-      gyroTurn(90);
-      gyroTurn(90);
-      gyroTurn(90);
-      gyroTurn(90);
->>>>>>> Stashed changes
       break;
-        case 1:
-        //code 1
-        Brain.Screen.clearScreen();
-        Brain.Screen.drawLine(1,20,200,200);
-        drive(50,50,2000);
-        driveBrake();
-        break;
-          case 2:
-          //code 2
-          Brain.Screen.clearScreen();
-          Brain.Screen.setFillColor(blue);
-          Brain.Screen.drawRectangle(1,20,200,200);
-          break;
-            case 3:
-            //code 3
-            gyroTurn(90);
-            gyroTurn(90);
-            gyroTurn(90);
-            gyroTurn(90);
-            break;
-
 }
 }
 /*---------------------------------------------------------------------------*/
@@ -343,6 +260,3 @@ Brain.Screen.pressed(selectAuton);
     wait(100, msec);
   }
 }
-//clear
-
-// hi you made it to the bottem of the code

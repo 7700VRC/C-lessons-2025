@@ -144,41 +144,52 @@ void inchDrive(float target){
 driveBrake();
 }
 
-float r=12.0
-void arcDrive(float R, float angle) {
-float TargetR = 2*Pi*(R+r)*angle/360;
-float errorR = TargetR;
-float kp = 1.0
-float accuarcy = 0.5;
-float s=0;
-float rspeed;
-float lspeed;
-while(fabs(errorL)>accuracy) {
-  rspeed=kp*errorR;
-  if(rspeed>100) rspeed=100;
-  if(rspeed<-100) rspeed=-100;
-  lspeed=rspeed*R/(R+r);
-  drive(lspeed,rspeed,10);
-  s=LeftMiddle.position(rev)*Pi*D*G
-  errorL = TargetL-s;
-  std::cout;
-}
-driveBrake();
-}
+// float r=12.0
+// void arcDrive(float R, float angle) {
+// float TargetR = 2*Pi*(R+r)*angle/360;
+// float errorR = TargetR;
+// float kp = 1.0
+// float accuracy = 0.5;
+// float s=0;
+// float rspeed;
+// float lspeed;
+// while(fabs(errorL)>accuracy) {
+//   rspeed=kp*errorR;
+//   if(rspeed>100) rspeed=100;
+//   if(rspeed<-100) rspeed=-100;
+//   lspeed=rspeed*R/(R+r);
+//   drive(lspeed,rspeed,10);
+//   s=LeftMiddle.position(rev)*Pi*D*G
+//   errorL = TargetL-s;
+//   // std::cout<<std::endl;
+// }
+// driveBrake();
+// }
 
 
 void gyroTurn(float target){
  float heading=0.0;
  float error=target-heading;
- float kp=0.7;
+ float kp =0.7;
+ float kd =0.7;
+ float dt = 10 / 1000;
+ float previous_error = 0;
  float speed = kp*error;
  float accuracy=0.5;
+ float minimum_power = 0.05;
+ float de = 0.1;
  Gyro.setRotation(0.0, degrees);
  while(fabs(error)>accuracy){
     drive(speed, -speed, 10);
     heading=Gyro.rotation(degrees);
     error=target-heading;
-    speed=kp*error;
+    de = error - previous_error;
+    speed=kp*error + kd * (de/dt);
+    if(fabs(speed) < minimum_power) {
+      speed = minimum_power * speed/fabs(speed);
+    } 
+
+    previous_error = error;
   }
 driveBrake();
  }
@@ -217,7 +228,12 @@ void autonomous(void) {
     case 0:
       //code 0
       wait(500,msec);
-      arcDrive(24,90);
+      gyroTurn(90);
+      gyroTurn(90);
+      gyroTurn(90);
+      gyroTurn(90);
+
+      
 
       break;
       case 1:
