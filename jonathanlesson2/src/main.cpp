@@ -17,7 +17,7 @@ competition Competition;
 // define your global instances of motors and other devices here
 controller  Controller1;
 brain Brain;
-
+/*
 /// MOTORS and Devices Info for 7899C Robot
 //Scoring/Intake Motors
 motor Intake = motor(PORT11, ratio6_1, false);
@@ -28,15 +28,7 @@ motor RightMiddle = motor(PORT5, ratio6_1, false);
 motor RightBack = motor(PORT6, ratio6_1, false);
 motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
-motor LeftBack = motor(PORT8, ratio6_1, true);
-
-
-
-
-
-
-
-
+motor LeftBack = motor(PORT8, ratio6_1, true);x`
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
@@ -44,8 +36,18 @@ digital_out Doinker = digital_out(Brain.ThreeWirePort.H);
 inertial Gyro = inertial(PORT20);
 //Potentiometer
 analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
-
+*/
 //END-- MOTORS and Devices Info for 7899C Robot
+
+//Motors for 7899X robot
+motor RightTop(PORT13,ratio6_1,true);
+motor RightMiddle(PORT19,ratio6_1,true);
+motor RightBack(PORT2,ratio6_1,false);
+motor LeftTop(PORT9,ratio6_1,false);
+motor LeftMiddle(PORT8,ratio6_1,false);
+motor LeftBack(PORT1,ratio6_1,true);
+motor Intake(PORT20,ratio6_1,false);
+inertial Gyro = inertial(PORT10);
 
 /*
 // MOTORS and Devices Info for 7899A Robot
@@ -107,6 +109,7 @@ void selectAuton(){
 
   }
   return;
+/*
 }
 void closeClamp(){
   Clamp.set(true);
@@ -122,6 +125,7 @@ void toggleClamp(){
 
 void doinker(){
   Doinker.set(!Doinker.value());
+*/
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -197,10 +201,10 @@ void gyroTurn(float target){
   float heading = 0.0;
   float error = target-heading;
   float kp = 0.7;
-  float kd = 0.7;
+/* float kd = 0.7;
   float de = 0;
   float dt = 10;
-  float perror=0;
+  float perror=0; */
   float speed = kp*error;
   float accuracy = 0.5;
   float mpower = 0.05;
@@ -208,12 +212,12 @@ void gyroTurn(float target){
     drive(speed,-speed,10);
     heading = Gyro.rotation(degrees);
     error = target-heading;
-    de=error-perror;
-    speed=kp*error+kd*(de/dt);
+  /*  de=error-perror; */
+    speed=kp*error; /*+kd*(de/dt); */
     if (fabs(speed)<mpower){
-      speed=mpower *speed/fabs(speed);
+  /*  speed=mpower *speed/fabs(speed);*/
     }
-    perror=error;
+  /*  perror=error; */
 
   }
   driveBrake();
@@ -261,8 +265,8 @@ void autonomous(void) {
   Brain.Screen.printAt(1,40,"My Auto is running ");
   switch (AutonSelected) {
     case 0:
-      inchDrive(60);
-      gyroTurn(-90);
+      inchDrive(48);
+      /*gyroTurn(-90);
       inchDrive(12);
       inchDrive(-48);
       inchDrive(24);
@@ -276,7 +280,7 @@ void autonomous(void) {
       break;
     case 1:
       //code 1
-      inchDrive(60);
+      inchDrive(48);
       gyroTurn(-90);
       inchDrive(12);
       inchDrive(-48);
@@ -300,7 +304,7 @@ void autonomous(void) {
       Brain.Screen.clearScreen();
       Brain.Screen.setFillColor(blue);
       Brain.Screen.drawRectangle(1,20,200,200);
-      break;
+      break;*/
 }
 }
 
