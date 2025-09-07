@@ -4,12 +4,12 @@
 		"json": 2
 	},
 	"project": {
-		"name": "jonathanlesson2",
+		"name": "DKlesson1",
 		"description": "",
 		"creationDate": "3/26/2025, 4:17:27 PM",
 		"platform": "V5",
 		"language": "cpp",
-		"slot": 1,
+		"slot": 8,
 		"sdkVersion": "V5_20240802_15_00_00",
 		"cpp": {
 			"includePath": [],

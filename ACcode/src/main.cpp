@@ -17,7 +17,7 @@ competition Competition;
 // define your global instances of motors and other devices here
 controller  Controller1;
 brain Brain;
-
+/*
 /// MOTORS and Devices Info for 7899C Robot
 //Scoring/Intake Motors
 motor Intake = motor(PORT11, ratio6_1, false);
@@ -29,6 +29,7 @@ motor RightBack = motor(PORT6, ratio6_1, false);
 motor LeftTop = motor(PORT10, ratio6_1, false);
 motor LeftMiddle = motor(PORT9, ratio6_1, true);
 motor LeftBack = motor(PORT8, ratio6_1, true);
+*/
 //Pneumatics
 digital_out Clamp = digital_out(Brain.ThreeWirePort.A);
 pneumatics Doinker = pneumatics(Brain.ThreeWirePort.H);
@@ -39,15 +40,15 @@ analog_in LBpot = analog_in(Brain.ThreeWirePort.B);
 
 //END-- MOTORS and Devices Info for 7899C Robot
 //hi
-/*
+
 // MOTORS and Devices Info for 7899A Robot
 //drivebase motors
-motor FrontLeft = motor (PORT14, ratio6_1, true);
-motor FrontRight = motor (PORT8, ratio6_1, false);
-motor MiddleLeft = motor (PORT17, ratio6_1, true);
-motor MiddleRight = motor (PORT7, ratio6_1, false);
-motor BackLeft = motor (PORT20, ratio6_1, true);
-motor BackRight = motor (PORT1, ratio6_1, false);
+motor LeftMiddle = motor (PORT14, ratio6_1, true);
+motor RightMiddle = motor (PORT8, ratio6_1, false);
+motor LeftTop = motor (PORT17, ratio6_1, true);
+motor RightTop = motor (PORT7, ratio6_1, false);
+motor LeftBack = motor (PORT20, ratio6_1, true);
+motor RightBack = motor (PORT1, ratio6_1, false);
 
 //subsystems
 motor skibiditoilet = motor (PORT9, ratio6_1, false);
@@ -55,11 +56,11 @@ motor ladyblack = motor (PORT4, ratio36_1, true);
 
 //postons
 pneumatics mogoClamp = Brain.ThreeWirePort.A;
-*/
+
 
 int AutonSelected=0;
 int AutonMin=0;
-int AutonMax=2;
+int AutonMax=3;
 
 void drawGUI(){
 Brain.Screen.clearScreen();
@@ -154,14 +155,30 @@ void gyroTurn(float target){
  float heading=0.0;
  float error= target-heading;
  float kp=0.7;
+ float kd=0.7;
+ float de = 0;
+ float dt = 10 / 1000; // 10 ms per loop in seconds
+ float previous_error = 0;
  float speed=kp*error;
  float accuracy=0.5;
+ float minimum_power = 0.05;
+
  Gyro.setRotation(0.0,degrees);
  while(fabs(error)>accuracy){
   drive(speed,-speed,10);
   heading=Gyro.rotation(degrees);
   error=target-heading;
-  speed=kp*error;
+  de = error = previous_error;
+  speed=kp*error + kd * (de/dt);
+  // 10 ms per loop
+  if (fabs(speed) < minimum_power){
+    speed = minimum_power * speed/fabs(speed);
+
+  }
+
+
+  previous_error = error;
+
  }
  driveBrake();
 }
@@ -188,12 +205,12 @@ void toggleClamp(){
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-  Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
-  drawGUI();
-  wait(2000, msec);
-  toggleClamp();
-  wait(200, msec);
-  openClamp();
+  // Brain.Screen.printAt(1,20,"Pre Auto is running my friend");
+  // drawGUI();
+  // wait(2000, msec);
+  // toggleClamp();
+  // wait(200, msec);
+  // openClamp();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -208,12 +225,75 @@ void pre_auton(void) {
 
 void autonomous(void) {
   Brain.Screen.printAt(1,40,"My Auto is running ");
+<<<<<<< HEAD
+      gyroTurn(90);
+      wait(200,msec);
+      gyroTurn(90);
+      wait(200,msec);
+      gyroTurn(90);
+      wait(200,msec);
+      gyroTurn(90); 
+
+  // switch (AutonSelected) {
+  //   case 0:
+  //     //code 0
+  //     gyroTurn(90);
+  //     wait(200,msec);
+  //     gyroTurn(90);
+  //     wait(200,msec);
+  //     gyroTurn(90);
+  //     wait(200,msec);
+  //     gyroTurn(90);
+  //     break;
+  //   case 1:
+  //     //code 1
+  //     Brain.Screen.clearScreen();
+  //     Brain.Screen.drawLine(1,20,200,200);
+  //     break;
+  //   case 2:
+  //     //code 2
+  //     Brain.Screen.clearScreen();
+  //     break;
+  //   case 3:
+  //     //code 3: gyroturn 360
+
+  // }
+=======
   switch (AutonSelected) {
     case 0:
       //code 0
-      arcDrive(24,90);
-      wait(500, msec);
+      inchDrive(36);
+      gyroTurn(-90);
+      //intake starts
+      inchDrive(8);
+      gyroTurn(90);
+      inchDrive(4);
+      //intake stops
+      inchDrive(-4);
+      gyroTurn(45);
       inchDrive(12);
+      gyroTurn(180);
+      inchDrive(4);
+      //Intake starts
+      wait(500, msec);
+      //Intake stops
+      gyroTurn(180);
+      inchDrive(-16);
+      gyroTurn(45);
+      //intake starts
+      inchDrive(48);
+      gyroTurn(-90);
+      inchDrive(4);
+      //intake stops
+      inchDrive(-4);
+      gyroTurn(-45);
+      inchDrive(12);
+      gyroTurn(180);
+      inchDrive(4);
+      //intake start
+      wait(500, msec);
+      //intake stop
+
       break;
       case 1:
       //code 1
@@ -223,7 +303,9 @@ void autonomous(void) {
       //code 2
       Brain.Screen.clearScreen();
   }
+>>>>>>> 0104f7179eb1f78f4f819a36fc70f32252bfea88
 }
+//hi
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              User Control Task                            */

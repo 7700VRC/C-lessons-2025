@@ -94,7 +94,6 @@ void drive(int lspeed, int rspeed, int wt){
   LeftBack.spin(forward,lspeed,pct);
   LeftMiddle.spin(forward,lspeed,pct);
   LeftTop.spin(forward,lspeed,pct);
-
   RightBack.spin(forward,rspeed,pct);
   RightMiddle.spin(forward,rspeed,pct);
   RightTop.spin(forward,rspeed,pct);
@@ -106,7 +105,7 @@ void driveBrake(){
   LeftMiddle.stop(brake);
   LeftTop.stop(brake);
   RightBack.stop(brake);
-  RightMiddle.stop(brake);
+  RightMiddle.stop(brake); //stops the motors
   RightTop.stop(brake);
 }
 float Pi=3.14159;
@@ -175,34 +174,32 @@ void autonomous(void) {
     case 0:
       //code 0
       Brain.Screen.drawCircle(200,200,25);
-      inchDrive(15);
-      wait(100, msec);
-      gyroTurn(90);
-      wait(100, msec);
-      inchDrive(48);
-      wait(100, msec);
-      inchDrive(-40);
-      wait(100, msec);
-      gyroTurn(-20);
-      wait(100, msec);
-      inchDrive(50);
-      wait(100, msec);
-      inchDrive(-50);
-      wait(100, msec);
-      gyroTurn(-45);
-      wait(100, msec);
-      inchDrive(100);
-      wait(100, msec);
-      gyroTurn(90);
-      wait(100, msec);
-      inchDrive(30);
-      wait(100, msec);
-      inchDrive(-30);
+      inchDrive(27);
       wait(100, msec);
       gyroTurn(-90);
       wait(100, msec);
-      inchDrive(-120);
-
+      inchDrive(4);          //code for push back 
+      wait(100, msec);
+      gyroTurn(90);
+      wait(100, msec);
+      inchDrive(-17)
+      wait(100,msec);
+      gyroTurn(-90);
+      wait(100, msec);
+      inchDrive(22);
+      wait(100, msec);
+      gyroTurn(-90);
+      wait(100, msec);
+      inchDrive(24);
+      wait(100, msec);
+      intake.spin (vex::directionType::fwd, 100, vex::units::pct);
+      wait(1000, msec);
+      intake.stop();
+      wait(100, msec);
+      inchDrive(-5)
+      gyroTurn(180);
+      wait(100, msec);
+      inchDrive(19);
       break;
       case 1:
       //code 1
